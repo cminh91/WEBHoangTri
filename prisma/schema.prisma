@@ -1,0 +1,500 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+  relationMode = "prisma"
+}
+
+// User model for authentication
+model User {
+  id            String    @id @default(cuid())
+  name          String    @unique
+  email         String?   @unique
+  password      String
+  role          Role      @default(USER)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  carts         Cart[]    // Relation to carts
+  addresses     Address[] // Relation to addresses
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+// Category model with self-relation for hierarchical structure
+model Category {
+  id            String    @id @default(cuid())
+  name          String
+  slug          String    @unique
+  description   String?   @db.Text
+  type          CategoryType
+  imageUrl      String?   // Added imageUrl field
+  parentId      String?
+  parent        Category? @relation("CategoryToSubcategories", fields: [parentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  subcategories Category[] @relation("CategoryToSubcategories")
+  products      Product[]
+  services      Service[]
+  news          News[]
+  isActive      Boolean   @default(true)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@index([parentId])
+  @@index([type])
+  @@index([isActive])
+}
+
+enum CategoryType {
+  PRODUCT
+  SERVICE
+  NEWS
+}
+  
+  // Sửa các relation khác
+  model Product {
+    id            String    @id @default(cuid())
+    name          String
+    slug          String    @unique
+    description   String?   @db.Text
+    longDescription String?   @db.LongText
+    price           Decimal   @db.Decimal(10, 2)
+    salePrice       Decimal?  @db.Decimal(10, 2)
+    inStock         Boolean   @default(true)
+    featured        Boolean   @default(false)
+    categoryId      String?
+    category        Category? @relation(fields: [categoryId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+    images          Image[]
+    specs           Json?
+    createdAt       DateTime  @default(now())
+    updatedAt       DateTime  @updatedAt
+    isActive        Boolean   @default(true)
+    metaTitle       String?
+    metaDescription String?   @db.Text
+    metaKeywords    String?   @db.Text
+    cartItems       CartItem[] // Relation to cart items
+  
+    @@index([categoryId])
+    @@index([isActive])
+    @@index([featured])
+    @@index([inStock])
+    @@index([createdAt])
+  }
+  
+  // Service model
+  model Service {
+    id              String    @id @default(cuid())
+    title           String
+    slug            String    @unique
+    description     String?   @db.Text
+    longDescription String?   @db.LongText
+    price           Decimal?  @db.Decimal(10, 2)
+    featured        Boolean   @default(false)
+    categoryId      String?
+    category        Category? @relation(fields: [categoryId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+    images          Image[]
+    features        String?   @db.Text
+    createdAt       DateTime  @default(now())
+    updatedAt       DateTime  @updatedAt
+    isActive        Boolean   @default(true)
+    viewCount       Int       @default(0)
+    icon            String?
+    metaTitle       String?
+    metaDescription String?   @db.Text
+    metaKeywords    String?   @db.Text
+  
+    @@index([categoryId])
+    @@index([isActive])
+    @@index([featured])
+    @@index([createdAt])
+  }
+  
+  // News model
+  model News {
+    id              String    @id @default(cuid())
+    title           String
+    slug            String    @unique
+    excerpt         String?   @db.Text
+    content         String    @db.LongText
+    author          String?
+    publishDate     DateTime  @default(now())
+    featured        Boolean   @default(false)
+    categoryId      String?
+    category        Category? @relation(fields: [categoryId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+    images          Image[]
+    tags            String?   @db.Text
+    createdAt       DateTime  @default(now())
+    updatedAt       DateTime  @updatedAt
+    isActive        Boolean   @default(true)
+    viewCount       Int       @default(0)
+    metaTitle       String?
+    metaDescription String?   @db.Text
+    metaKeywords    String?   @db.Text
+  
+    @@index([categoryId])
+    @@index([isActive])
+    @@index([featured])
+    @@index([publishDate])
+    @@index([createdAt])
+  }
+  
+  // Cart model
+  model Cart {
+    id              String    @id @default(cuid())
+    userId          String?
+    user            User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
+    items           CartItem[]
+    status          CartStatus @default(ACTIVE)
+    total           Decimal?  @db.Decimal(10, 2)
+    createdAt       DateTime  @default(now())
+    updatedAt       DateTime  @updatedAt
+    sessionId       String?   // For guest carts
+    notes           String?   @db.Text
+    checkoutId      String?   // External payment ID
+    addressId       String?
+    address         Address?  @relation(fields: [addressId], references: [id], onDelete: SetNull)
+  
+    @@index([userId])
+    @@index([status])
+    @@index([sessionId])
+    @@index([addressId])
+  }
+  
+  // Cart status enum
+  enum CartStatus {
+    ACTIVE
+    CHECKOUT
+    COMPLETED
+    ABANDONED
+  }
+  
+  // Cart item model
+  // For CartItem model
+  model CartItem {
+    id              String    @id @default(cuid())
+    cartId          String
+    cart            Cart      @relation(fields: [cartId], references: [id], onDelete: Cascade)
+    productId       String
+    product         Product   @relation(fields: [productId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+    quantity        Int
+    price           Decimal   @db.Decimal(10, 2)
+    createdAt       DateTime  @default(now())
+    updatedAt       DateTime  @updatedAt
+    options         Json?     // For product options/variants
+  
+    @@index([cartId])
+    @@index([productId])
+    @@unique([cartId, productId]) // Prevent duplicate products in cart
+  }
+  
+  // Address model
+  model Address {
+    id              String    @id @default(cuid())
+    userId          String
+    user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+    name            String    // Recipient name
+    phone           String
+    address         String
+    city            String
+    district        String
+    ward            String
+    isDefault       Boolean   @default(false)
+    createdAt       DateTime  @default(now())
+    updatedAt       DateTime  @updatedAt
+    carts           Cart[]    // Relation to carts
+  
+    @@index([userId])
+    @@index([isDefault])
+  }
+  
+  // About model
+  model About {
+    id              String    @id @default(cuid())
+    title           String
+    content         String    @db.LongText
+    mission         String?   @db.Text
+    vision          String?   @db.Text
+    history         String?   @db.LongText
+    images          Image[]
+    createdAt       DateTime  @default(now())
+    updatedAt       DateTime  @updatedAt
+    metaTitle       String?
+    metaDescription String?   @db.Text
+    metaKeywords    String?   @db.Text
+  }
+  
+  // Team member model
+  model TeamMember {
+    id              String    @id @default(cuid())
+    name            String
+    position        String
+    bio             String?   @db.Text
+    image           String?
+    socialLinks     Json?
+    order           Int       @default(0)
+    createdAt       DateTime  @default(now())
+    updatedAt       DateTime  @updatedAt
+    isActive        Boolean   @default(true)
+    email           String?
+    phone           String?
+  
+    @@index([isActive])
+    @@index([order])
+  }
+  //
+  model StoreInfo {
+    id        String   @id @default(cuid())
+    name      String
+    logo      String?
+    favicon   String?
+     hotline   String 
+    footer    String?  @db.Text
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+  }
+  // Contact model
+  model Contact {
+    id              String    @id @default(cuid())
+    address         String
+    phone           String
+    email           String
+    workingHours    Json?
+    mapUrl          String?   @db.Text
+    socialLinks     Json?
+    createdAt       DateTime  @default(now())
+    updatedAt       DateTime  @updatedAt
+    whatsapp        String?
+    zalo            String?
+    hotline         String?
+  }
+  
+  // Contact form submissions
+  model ContactForm {
+    id              String    @id @default(cuid())
+    name            String
+    email           String
+    phone           String?
+    subject         String?
+    message         String    @db.Text
+    read            Boolean   @default(false)
+    createdAt       DateTime  @default(now())
+    updatedAt       DateTime  @updatedAt
+    status          ContactFormStatus @default(NEW)
+    response        String?   @db.Text
+    respondedAt     DateTime?
+    respondedBy     String?
+  
+    @@index([read])
+    @@index([status])
+    @@index([createdAt])
+  }
+  
+  enum ContactFormStatus {
+    NEW
+    IN_PROGRESS
+    COMPLETED
+    SPAM
+  }
+  
+  // Image model
+  model Image {
+    id              String    @id @default(cuid())
+    url             String
+    alt             String?
+    productId       String?
+    product         Product?  @relation(fields: [productId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+    serviceId       String?
+    service         Service?  @relation(fields: [serviceId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+    newsId          String?
+    news            News?     @relation(fields: [newsId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+    aboutId         String?
+    about           About?    @relation(fields: [aboutId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+    createdAt       DateTime  @default(now())
+    updatedAt       DateTime  @updatedAt
+    title           String?
+    description     String?   @db.Text
+    isFeatured      Boolean   @default(false)
+    order           Int       @default(0)
+  
+    @@index([productId])
+    @@index([serviceId])
+    @@index([newsId])
+    @@index([aboutId])
+    @@index([isFeatured])
+    @@index([order])
+  }
+  
+  // Settings model
+  model Settings {
+    id              String    @id @default(cuid())
+    key             String    @unique
+    value           String    @db.Text
+    createdAt       DateTime  @default(now())
+    updatedAt       DateTime  @updatedAt
+    description     String?   @db.Text
+    group           String?
+  
+    @@index([group])
+  }
+  
+  // Policy model
+  model Policy {
+    id              String    @id @default(cuid())
+    title           String
+    slug            String    @unique
+    excerpt         String?   @db.Text
+    content         String    @db.LongText
+    isPublished     Boolean   @default(true)
+    createdAt       DateTime  @default(now())
+    updatedAt       DateTime  @updatedAt
+    order           Int       @default(0)
+    metaTitle       String?
+    metaDescription String?   @db.Text
+    metaKeywords    String?   @db.Text
+  
+    @@index([isPublished])
+    @@index([order])
+  }
+  
+  // Slider model
+  model Slider {
+    id              String    @id @default(cuid())
+    title           String
+    subtitle        String?
+    url             String
+    link            String?
+    isActive        Boolean   @default(true)
+    order           Int       @default(0)
+    createdAt       DateTime  @default(now())
+    updatedAt       DateTime  @updatedAt
+    buttonText      String?
+    description     String?   @db.Text
+    mobileUrl       String?
+  
+    @@index([isActive])
+    @@index([order])
+  }
+  
+  // Analytics model
+  model Analytics {
+    id              String    @id @default(cuid())
+    pageViews       Int       @default(0)
+    uniqueVisitors  Int       @default(0)
+    date            DateTime  @default(now())
+    path            String?
+    referrer        String?
+    device          String?
+    browser         String?
+    country         String?
+    createdAt       DateTime  @default(now())
+    updatedAt       DateTime  @updatedAt
+    sessionDuration Int?      @default(0)
+    bounceRate      Float?
+    exitRate        Float?
+  
+    @@index([date])
+    @@index([path])
+    @@index([device])
+    @@index([browser])
+    @@index([country])
+  }
+  
+  // FAQ model
+  model FAQ {
+    id              String    @id @default(cuid())
+    question        String
+    answer          String    @db.Text
+    category        String?
+    order           Int       @default(0)
+    isActive        Boolean   @default(true)
+    createdAt       DateTime  @default(now())
+    updatedAt       DateTime  @updatedAt
+  
+    @@index([category])
+    @@index([isActive])
+    @@index([order])
+  }
+  
+  // Testimonial model
+  model Testimonial {
+    id              String    @id @default(cuid())
+    name            String
+    position        String?
+    company         String?
+    content         String    @db.Text
+    rating          Int       @default(5)
+    image           String?
+    isActive        Boolean   @default(true)
+    order           Int       @default(0)
+    createdAt       DateTime  @default(now())
+    updatedAt       DateTime  @updatedAt
+  
+    @@index([isActive])
+    @@index([order])
+    @@index([rating])
+  }
+  
+  // Partner model
+  model Partner {
+    id        String   @id @default(cuid())
+    name      String
+    logo      String
+    website   String?
+    order     Int      @default(0)
+    isActive  Boolean  @default(true)
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+  
+    @@index([isActive])
+    @@index([order])
+  }
+  
+  // Menu model
+  model Menu {
+    id              String    @id @default(cuid())
+    name            String
+    location        String
+    items           Json
+    isActive        Boolean   @default(true)
+    createdAt       DateTime  @default(now())
+    updatedAt       DateTime  @updatedAt
+  
+    @@index([location])
+    @@index([isActive])
+  }
+  
+  // Promotion model
+  model Promotion {
+    id              String    @id @default(cuid())
+    title           String
+    description     String?   @db.Text
+    code            String?   @unique
+    discountType    DiscountType @default(PERCENTAGE)
+    discountValue   Decimal   @db.Decimal(10, 2)
+    startDate       DateTime
+    endDate         DateTime
+    isActive        Boolean   @default(true)
+    createdAt       DateTime  @default(now())
+    updatedAt       DateTime  @updatedAt
+    image           String?
+    usageLimit      Int?
+    usageCount      Int       @default(0)
+  
+    @@index([isActive])
+    @@index([startDate])
+    @@index([endDate])
+    @@index([code])
+  }
+  
+  enum DiscountType {
+    PERCENTAGE
+    FIXED_AMOUNT
+  }
+

@@ -1,0 +1,11 @@
+# Allow crawling of all content
+User-agent: *
+Allow: /
+
+# Disallow admin pages
+Disallow: /admin/
+Disallow: /api/
+Disallow: /_next/
+
+# Sitemap
+Sitemap: https://hoangtrimoto.com/sitemap.xml
