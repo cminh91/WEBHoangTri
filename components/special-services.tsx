@@ -3,13 +3,20 @@
 import { useState, useEffect, useMemo, useCallback } from "react"
 import Image from "next/image"
 import Link from "next/link"
+import { getFeaturedServices } from "@/lib/queries"
 
 interface Service {
   id: string
   title: string
-  slug: string
+  slug?: string
   description: string | null
   images: { url: string; alt: string | null }[]
+  price: number | null
+  category: {
+    id: string
+    name: string
+    slug: string
+  } | null
 }
 
 interface SpecialServicesProps {
@@ -25,10 +32,7 @@ export default function SpecialServices({ initialServices }: SpecialServicesProp
 
     const fetchServices = async () => {
       try {
-        const response = await fetch('/api/services/featured?limit=4')
-        if (!response.ok) throw new Error('Failed to fetch services')
-
-        const data = await response.json()
+        const data = await getFeaturedServices()
         setServices(data)
       } catch (error) {
         console.error('Error fetching services:', error)
@@ -44,7 +48,7 @@ export default function SpecialServices({ initialServices }: SpecialServicesProp
     images.length ? images[0].url : "/placeholder.svg", 
   [])
 
-  const displayedServices = useMemo(() => services.slice(0, 3), [services])
+  const displayedServices = useMemo(() => services.slice(0, 4), [services])
 
   if (loading) {
     return (
@@ -82,30 +86,30 @@ export default function SpecialServices({ initialServices }: SpecialServicesProp
           {displayedServices.map((service, index) => (
             <Link href={`/dich-vu/${service.slug}`} key={service.id} className="block group">
               <div className="grid grid-cols-1 md:grid-cols-2 items-center gap-12">
-                {index % 2 === 0 ? (
-                  <>
-                    {/* Hình ảnh bên trái */}
-                    <div className="relative w-full h-auto">
-                      <Image
-                        src={getImageUrl(service.images)}
-                        alt={service.title}
-                        width={600}
-                        height={350}
-                        className="w-full h-auto object-cover rounded-lg transition-transform duration-300 group-hover:scale-105"
-                      />
+                <>
+                  {/* Hình ảnh bên trái */}
+                  <div className="relative w-full h-auto">
+                    <Image
+                      src={getImageUrl(service.images)}
+                      alt={service.title}
+                      width={600}
+                      height={350}
+                      className="w-full h-auto object-cover rounded-lg transition-transform duration-300 group-hover:scale-105"
+                      loading="lazy"
+                      priority={false}
+                    />
+                  </div>
+                  {/* Nội dung bên phải */}
+                  <div className="text-left">
+                    <div className="border-l-4 border-red-500 pl-2 mb-4">
+                      <h3 className="text-2xl font-bold">{service.title}</h3>
                     </div>
-                    {/* Nội dung bên phải */}
-                    <div className="text-left">
-                      <div className="border-l-4 border-red-500 pl-2 mb-4">
-                        <h3 className="text-2xl font-bold">{service.title}</h3>
-                      </div>
-                      <p className="text-gray-400">{service.description}</p>
-                      <span className="mt-4 block text-red-500 font-semibold underline transition-opacity duration-300 group-hover:opacity-75">
-                        XEM THÊM
-                      </span>
-                    </div>
-                  </>
-                ) : null}
+                    <p className="text-gray-400">{service.description}</p>
+                    <span className="mt-4 block text-red-500 font-semibold underline transition-opacity duration-300 group-hover:opacity-75">
+                      XEM THÊM
+                    </span>
+                  </div>
+                </>
               </div>
             </Link>
           ))}

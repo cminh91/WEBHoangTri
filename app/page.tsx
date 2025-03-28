@@ -1,22 +1,36 @@
-import { SliderDisplay } from "@/components/slider/slider-display"
-import CategoryGrid from "@/components/category-grid"
-import YouTubeSection from "@/components/youtube-section"
-import StatsCounter from "@/components/stats-counter"
-import TrustedPartners from "@/components/trusted-partners"
-import SpecialServices from "@/components/special-services"
-import WhyChooseUs from "@/components/why-choose-us"
-import PricingSection from "@/components/pricing-section"
-import TeamMembers from "@/components/about/team-members"
-import FeaturedProducts from "@/components/featured-products"
-import NewsSection from "@/components/news-section"
-import { 
+import dynamic from 'next/dynamic'
+
+const SliderDisplay = dynamic<SliderDisplayProps>(() => import("@/components/slider/slider-display").then(mod => mod.SliderDisplay), {
+  loading: () => <div className="w-full" style={{ paddingTop: "41.67%" }} />
+})
+
+const CategoryGrid = dynamic(() => import("@/components/category-grid"))
+const YouTubeSection = dynamic(() => import("@/components/youtube-section"))
+const StatsCounter = dynamic(() => import("@/components/stats-counter"))
+const TrustedPartners = dynamic(() => import("@/components/trusted-partners"), {
+  loading: () => <div className="py-16 bg-black" />
+})
+const SpecialServices = dynamic(() => import("@/components/special-services"), {
+  loading: () => <section className="bg-black py-16"><div className="container mx-auto px-4">Loading services...</div></section>
+})
+const WhyChooseUs = dynamic(() => import("@/components/why-choose-us"))
+const PricingSection = dynamic(() => import("@/components/pricing-section"))
+const TeamMembers = dynamic(() => import("@/components/about/team-members"))
+const FeaturedProducts = dynamic(() => import("@/components/featured-products"), {
+  loading: () => <div className="py-16 bg-black" />
+})
+const NewsSection = dynamic(() => import("@/components/news-section"))
+import {
   getSliders,
   getCategories,
   getFeaturedProducts,
   getTeamMembers,
   getLatestNews,
-  getStoreInfo
+  getStoreInfo,
+  getFeaturedServices,
+  getPartners
 } from "@/lib/queries"
+import { SliderDisplayProps } from "@/components/slider/slider-display"
 
 export default async function Home() {
   // Fetch dữ liệu từ API
@@ -26,14 +40,18 @@ export default async function Home() {
     products,
     teamData,
     newsData,
-    storeInfo
+    storeInfo,
+    services,
+    partners
   ] = await Promise.all([
     getSliders(),
     getCategories(),
     getFeaturedProducts(),
     getTeamMembers(),
     getLatestNews(),
-    getStoreInfo()
+    getStoreInfo(),
+    getFeaturedServices(),
+    getPartners()
   ])
 
   // Format dữ liệu slider
@@ -64,7 +82,22 @@ export default async function Home() {
     bio: member.bio || 'Thông tin thành viên',
     order: member.order
   }))
+// Format dữ liệu services
+const formattedServices = services.map(service => ({
+  ...service,
+  slug: service.title?.toLowerCase().replace(/\s+/g, '-') || '',
+  description: service.description || 'Mô tả dịch vụ',
+  price: service.price ? Number(service.price.toString()) : null // format price
+}))
 
+  // Format dữ liệu partners
+  const formattedPartners = partners.map(partner => ({
+    id: partner.id,
+    name: partner.name,
+    logo: partner.logo,
+    website: partner.website,
+    order: partner.order
+  }))
   // Format dữ liệu news
   const formattedNews = newsData.map(news => ({
     ...news,
@@ -78,18 +111,18 @@ export default async function Home() {
 
   return (
     <main className="flex min-h-screen flex-col">
-       <SliderDisplay sliders={formattedSliders} />
+      <SliderDisplay sliders={formattedSliders} />
 
-<WhyChooseUs />
+      <WhyChooseUs />
 
-<SpecialServices />
+      <SpecialServices initialServices={formattedServices} />
 
       <YouTubeSection videoId={storeInfo.youtubeVideoId} />
       <CategoryGrid categories={categories} />
       <FeaturedProducts initialProducts={formattedProducts} />
       <NewsSection initialNews={formattedNews} />
       <StatsCounter />
-      <TrustedPartners />
+      <TrustedPartners initialPartners={formattedPartners} />
       <TeamMembers teamMembers={formattedTeam} />
       <PricingSection />
 

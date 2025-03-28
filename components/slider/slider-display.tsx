@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button"
 import { ChevronLeft, ChevronRight } from "lucide-react"
 import { useState, useEffect } from "react"
 
-interface SliderDisplayProps {
+export interface SliderDisplayProps {
   sliders: Slider[]
 }
 

@@ -41,6 +41,8 @@ export default function WhyChooseUs() {
                 width={600}
                 height={500}
                 className="h-full w-full object-cover"
+                loading="lazy"
+                priority={false}
               />
               <div className="absolute bottom-8 right-8 h-20 w-20 rounded-full bg-white p-2">
                 <div className="flex h-full w-full items-center justify-center rounded-full border-2 border-red-600">

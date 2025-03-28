@@ -1,4 +1,5 @@
 import prisma from "./prisma"
+import { Product, Service } from "../types"
 
 if (!prisma) {
   throw new Error("Prisma client không được khởi tạo")
@@ -46,6 +47,8 @@ export async function getCategories() {
         id: true,
         name: true,
         slug: true,
+        type: true,
+        parentId: true,
         description: true,
         imageUrl: true
       }
@@ -85,15 +88,7 @@ export async function getFeaturedProducts() {
       }
     })
     
-    return products.map((product: {
-      id: string;
-      name: string;
-      price: string | null;
-      salePrice: string | null;
-      images: { url: string; alt: string }[];
-      category: { name: string; slug: string } | null;
-      [key: string]: any;
-    }) => ({
+    return products.map((product) => ({
       ...product,
       price: product.price ? Number(product.price) : 0,
       salePrice: product.salePrice ? Number(product.salePrice) : 0,
@@ -128,23 +123,20 @@ export async function getFeaturedServices() {
           }
         }
       },
+      take: 3,
       orderBy: {
         createdAt: 'desc'
       }
     })
 
-    return services.map((service: {
-      id: string;
-      name: string;
-      description: string | null;
-      price: string | null;
-      images: { url: string; alt: string }[];
-      category: { id: string; name: string; slug: string } | null;
-      [key: string]: any;
-    }) => ({
+    return services.map((service): Service => ({
       ...service,
+      title: service.title || '',
       price: service.price ? Number(service.price) : null,
-      images: service.images.map((img: { url: string; alt: string }) => ({ url: img.url, alt: img.alt }))
+      images: service.images.map((img) => ({
+        url: img.url,
+        alt: img.alt || null
+      }))
     }))
   } catch (error) {
     console.error("Failed to fetch featured services:", error)
@@ -179,15 +171,7 @@ export async function getLatestNews() {
       }
     })
     
-    return news.map((item: {
-      id: string;
-      title: string;
-      content: string;
-      publishDate: Date;
-      images: { url: string; alt: string }[];
-      category: { name: string; slug: string } | null;
-      [key: string]: any;
-    }) => ({
+    return news.map((item) => ({
       ...item,
       images: item.images.map((img: { url: string }) => img.url),
       categoryName: item.category?.name || null

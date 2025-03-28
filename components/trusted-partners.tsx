@@ -3,13 +3,13 @@
 import { useState, useEffect } from "react"
 import Image from "next/image"
 import Link from "next/link"
+import { getPartners } from "@/lib/queries"
 
 interface Partner {
   id: string
   name: string
   logo: string
   website?: string | null
-  isActive?: boolean
   order: number
 }
 
@@ -22,13 +22,20 @@ export default function TrustedPartners({ initialPartners }: TrustedPartnersProp
   const [loading, setLoading] = useState(!initialPartners)
 
   useEffect(() => {
-    if (!initialPartners) {
-      fetch('/api/partners/public')
-        .then(res => res.json())
-        .then(setPartners)
-        .catch(console.error)
-        .finally(() => setLoading(false))
+    if (initialPartners) return
+
+    const fetchPartners = async () => {
+      try {
+        const data = await getPartners()
+        setPartners(data)
+      } catch (error) {
+        console.error('Error fetching partners:', error)
+      } finally {
+        setLoading(false)
+      }
     }
+
+    fetchPartners()
   }, [initialPartners])
 
   return (
