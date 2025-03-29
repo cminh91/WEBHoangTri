@@ -5,7 +5,7 @@ import Image from "next/image"
 import { Menu, Phone } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { CartButton } from "@/components/cart/cart-button"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 
 // Hàm để xây dựng cây danh mục
 function buildCategoryTree(categories: Category[]) {
@@ -236,20 +236,78 @@ interface NavbarProps {
   }
 }
 
-export default function Navbar({ 
+export default function Navbar({
   categories = {
-    products: [],
-    services: [], 
-    news: []
+    products: [
+      {id: 'default-1', name: 'Sản phẩm', slug: 'san-pham', type: 'PRODUCT', parentId: null}
+    ],
+    services: [
+      {id: 'default-2', name: 'Dịch vụ', slug: 'dich-vu', type: 'SERVICE', parentId: null}
+    ],
+    news: [
+      {id: 'default-3', name: 'Tin tức', slug: 'tin-tuc', type: 'NEWS', parentId: null}
+    ]
   },
-  storeInfo 
+  storeInfo = {
+    name: "MOTO EDIT",
+    logo: "/logo.png",
+    hotline: "1900 1234",
+    address: "123 Đường Lớn, TP.HCM",
+    phone: "0123456789",
+    email: "info@motoedit.vn",
+    workingHours: "8:00 - 17:30 (Thứ 2 - Thứ 7)"
+  }
 }: NavbarProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const [currentCategories, setCurrentCategories] = useState(categories)
+  const [currentStoreInfo, setCurrentStoreInfo] = useState(storeInfo)
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        console.log('Bắt đầu fetch dữ liệu...')
+        const [categoriesRes, storeRes] = await Promise.all([
+          fetch('/api/categories'),
+          fetch('/api/store-info')
+        ])
+        
+        console.log('Kết quả categoriesRes:', categoriesRes)
+        console.log('Kết quả storeRes:', storeRes)
+        
+        if (categoriesRes.ok) {
+          const data = await categoriesRes.json()
+          console.log('Dữ liệu categories nhận được:', data)
+          setCurrentCategories({
+            products: data.filter((c: any) => c.type === 'PRODUCT'),
+            services: data.filter((c: any) => c.type === 'SERVICE'),
+            news: data.filter((c: any) => c.type === 'NEWS')
+          })
+        } else {
+          console.error('Lỗi categoriesRes:', categoriesRes.status)
+        }
+        
+        if (storeRes.ok) {
+          const storeData = await storeRes.json()
+          console.log('Dữ liệu store nhận được:', storeData)
+          setCurrentStoreInfo(storeData)
+        } else {
+          console.error('Lỗi storeRes:', storeRes.status)
+        }
+      } catch (error) {
+        console.error('Error fetching navbar data:', error)
+      }
+    }
+    
+    // Only fetch if initial data is empty
+    if (categories.products.length === 0 || !storeInfo) {
+      fetchData()
+    }
+  }, [categories, storeInfo])
   
   // Safe access with nullish coalescing
-  const productCategories = buildCategoryTree(categories?.products ?? [])
-  const serviceCategories = buildCategoryTree(categories?.services ?? [])
-  const newsCategories = buildCategoryTree(categories?.news ?? [])
+  const productCategories = buildCategoryTree(currentCategories?.products ?? [])
+  const serviceCategories = buildCategoryTree(currentCategories?.services ?? [])
+  const newsCategories = buildCategoryTree(currentCategories?.news ?? [])
 
   return (
     <header className="fixed left-0 top-0 z-50 w-full bg-black/90 backdrop-blur-sm">
@@ -380,3 +438,5 @@ export default function Navbar({
     </header>
   )
 }
+
+
