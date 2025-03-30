@@ -61,7 +61,18 @@ export async function GET(request: Request) {
     if (!hierarchical) {
       // Get count information
       const categoriesWithCount = await Promise.all(
-        allCategories.map(async (category) => {
+        allCategories.map(async (category: {
+          id: string;
+          name: string;
+          slug: string;
+          description: string | null;
+          type: string;
+          parentId: string | null;
+          isActive: boolean;
+          imageUrl: string | null;
+          createdAt: Date;
+          updatedAt: Date;
+        }) => {
           const [productsCount, servicesCount, newsCount] = await Promise.all([
             prisma.product.count({ where: { categoryId: category.id } }),
             prisma.service.count({ where: { categoryId: category.id } }),
@@ -101,8 +112,19 @@ export async function GET(request: Request) {
     // Helper function to build tree structure
     const buildCategoryTree = (parentId: string | null): CategoryTree[] => {
       return allCategories
-        .filter(category => category.parentId === parentId)
-        .map(category => ({
+        .filter((category: { parentId: string | null }) => category.parentId === parentId)
+        .map((category: {
+          id: string;
+          name: string;
+          slug: string;
+          description: string | null;
+          type: string;
+          parentId: string | null;
+          isActive: boolean;
+          imageUrl: string | null;
+          createdAt: Date;
+          updatedAt: Date;
+        }) => ({
           ...category,
           subcategories: buildCategoryTree(category.id)
         }))

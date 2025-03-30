@@ -1,35 +1,24 @@
-"use client"
+import { getContactInfo, getAllCategories, getStoreInfo } from "@/lib/queries"
+import ClientMainLayout from "./client-main-layout"
 
-import { usePathname } from "next/navigation"
-import Navbar from "@/components/navbar"
-import Footer from "@/components/footer"
-import { CartProvider } from "@/components/cart/cart-provider"
+export default async function MainLayout({ children }: { children: React.ReactNode }) {
+  const [contactInfo, categories, storeInfo] = await Promise.all([
+    getContactInfo(),
+    getAllCategories(),
+    getStoreInfo()
+  ])
 
-export default function MainLayout({ children }: { children: React.ReactNode }) {
-  const pathname = usePathname()
-  const isAdminPage = pathname?.startsWith('/admin')
-  const DEFAULT_CATEGORIES = {
-    products: [],
-    services: [],
-    news: []
-  }
-  
-  const DEFAULT_STORE_INFO = {
-    name: "MOTO EDIT",
-    logo: "/logo.png",
-    hotline: "1900 1234"
-  }
+  console.log('Contact Info:', contactInfo)
+  console.log('Categories:', categories)
+  console.log('Store Info:', storeInfo)
 
   return (
-    <CartProvider>
-      {!isAdminPage && (
-        <Navbar 
-          categories={DEFAULT_CATEGORIES}
-          storeInfo={DEFAULT_STORE_INFO}
-        />
-      )}
+    <ClientMainLayout 
+      contactInfo={contactInfo}
+      categories={categories}
+      storeInfo={storeInfo}
+    >
       {children}
-      {!isAdminPage && <Footer />}
-    </CartProvider>
+    </ClientMainLayout>
   )
 }

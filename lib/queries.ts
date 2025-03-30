@@ -100,7 +100,76 @@ export async function getFeaturedProducts() {
   }
 }
 
-// Fetch featured services 
+// Fetch all categories with hierarchy
+export async function getAllCategories() {
+  try {
+    console.log('Fetching all active categories from database...')
+    const allCategories = await prisma.category.findMany({
+      where: { isActive: true },
+      orderBy: [
+        { type: 'asc' },
+        { name: 'asc' }
+      ],
+      include: {
+        subcategories: {
+          where: { isActive: true },
+          orderBy: { name: 'asc' },
+          include: {
+            subcategories: {
+              where: { isActive: true },
+              orderBy: { name: 'asc' },
+              include: {
+                subcategories: true // Thêm include để debug
+              }
+            }
+          }
+        }
+      }
+    })
+    console.log('Raw categories data:', JSON.stringify(allCategories, null, 2))
+
+    // Build category tree
+    const categoryMap = new Map<string, any>()
+    const rootCategories: any[] = []
+    
+    allCategories.forEach(category => {
+      const node = {
+        ...category,
+        children: []
+      }
+      categoryMap.set(category.id, node)
+      
+      if (category.parentId) {
+        const parent = categoryMap.get(category.parentId)
+        if (parent) {
+          parent.children.push(node)
+        } else {
+          rootCategories.push(node)
+        }
+      } else {
+        rootCategories.push(node)
+      }
+    })
+
+    // Trả về cây danh mục đã xây dựng
+    return {
+      products: rootCategories.filter(c => c.type === 'PRODUCT'),
+      services: rootCategories.filter(c => c.type === 'SERVICE'),
+      news: rootCategories.filter(c => c.type === 'NEWS'),
+      all: rootCategories // Thêm trường all chứa toàn bộ cây
+    }
+
+  } catch (error) {
+    console.error("Failed to fetch all categories:", error)
+    return {
+      products: [],
+      services: [],
+      news: []
+    }
+  }
+}
+
+// Fetch featured services
 export async function getFeaturedServices() {
   try {
     const services = await prisma.service.findMany({
@@ -236,50 +305,43 @@ export async function getPartners() {
   }
 }
 
+// Helper to parse social links
+function parseSocialLinks(socialLinks: any) {
+  if (!socialLinks) return null;
+  if (typeof socialLinks === 'object') return socialLinks;
+  try {
+    return JSON.parse(socialLinks);
+  } catch {
+    return null;
+  }
+}
+
 // Fetch store info
 export async function getStoreInfo() {
   try {
-    const settings = await prisma.settings.findFirst({
-      where: {
-        key: 'store'
-      }
-    })
-    
-    if (settings?.value) {
-      try {
-        const parsedValue = JSON.parse(settings.value)
-        const youtubeUrl = parsedValue.socialLinks?.youtube
-        const videoId = youtubeUrl ? youtubeUrl.split('v=')[1] : ''
+    const storeInfo = await prisma.storeInfo.findFirst();
+    const contactInfo = await prisma.contact.findFirst();
+    const socialLinks = parseSocialLinks(contactInfo?.socialLinks);
 
-        return {
-          name: parsedValue.storeName || 'MOTO EDIT',
-          address: parsedValue.address || '123 Đường Lớn, Quận 1, TP. Hồ Chí Minh',
-          phone: parsedValue.phone || '0123456789',
-          email: parsedValue.email || 'info@motoedit.vn',
-          workingHours: parsedValue.workingHours || '8:00 - 17:30 (Thứ 2 - Thứ 7)',
-          facebookUrl: parsedValue.socialLinks?.facebook || 'https://facebook.com',
-          instagramUrl: parsedValue.socialLinks?.instagram || 'https://instagram.com', 
-          youtubeUrl: youtubeUrl || '',
-          youtubeVideoId: videoId || '',
-          logoUrl: "/logo.png"
-        }
-      } catch (error) {
-        console.error("Error parsing store settings:", error)
-      }
-    }
-    
     return {
-      name: "MOTO EDIT",
-      address: "123 Đường Lớn, Quận 1, TP. Hồ Chí Minh", 
-      phone: "0123456789",
-      email: "info@motoedit.vn",
-      workingHours: "8:00 - 17:30 (Thứ 2 - Thứ 7)",
-      facebookUrl: "https://facebook.com",
-      instagramUrl: "https://instagram.com",
-      youtubeUrl: "https://youtube.com",
-      youtubeVideoId: "",
-      logoUrl: "/logo.png"
-    }
+      name: storeInfo?.name || "MOTO EDIT",
+      address: contactInfo?.address || "123 Đường Lớn, Quận 1, TP. Hồ Chí Minh",
+      phone: storeInfo?.hotline || contactInfo?.phone || "0123456789",
+      hotline: storeInfo?.hotline || contactInfo?.phone || "0123456789",
+      email: contactInfo?.email || "info@motoedit.vn",
+      workingHours: contactInfo?.workingHours
+        ? typeof contactInfo.workingHours === 'string'
+          ? contactInfo.workingHours
+          : JSON.stringify(contactInfo.workingHours)
+        : "8:00 - 17:30 (Thứ 2 - Thứ 7)",
+      facebookUrl: socialLinks?.facebook || "https://facebook.com",
+      instagramUrl: socialLinks?.instagram || "https://instagram.com",
+      youtubeUrl: socialLinks?.youtube || "https://youtube.com",
+      youtubeVideoId: socialLinks?.youtube
+        ? socialLinks.youtube.split('v=')[1] || ""
+        : "",
+      logoUrl: storeInfo?.logo || "/logo.png"
+    };
   } catch (error) {
     console.error("Failed to fetch store info:", error)
     return {
@@ -324,5 +386,73 @@ export async function getTeamMembers() {
   } catch (error) {
     console.error("Failed to fetch team members:", error)
     return []
+  }
+}
+
+// Fetch contact info
+export async function getContactInfo() {
+  console.log('Fetching contact info from database...')
+  try {
+    const contact = await prisma.contact.findFirst({
+      select: {
+        address: true,
+        phone: true,
+        email: true,
+        workingHours: true, // Dạng JSON
+        mapUrl: true,
+        socialLinks: true, // Dạng JSON
+        whatsapp: true,
+        zalo: true,
+        hotline: true,
+      },
+    })
+
+    if (!contact) {
+      console.warn("Không tìm thấy thông tin liên hệ.")
+      return null // Hoặc trả về giá trị mặc định
+    }
+
+    // Xử lý dữ liệu JSON nếu cần
+    let parsedWorkingHours = null
+    if (typeof contact.workingHours === 'string') {
+      try {
+        parsedWorkingHours = JSON.parse(contact.workingHours)
+      } catch (e) {
+        console.error("Lỗi parse workingHours JSON:", e)
+      }
+    } else if (contact.workingHours) {
+       parsedWorkingHours = contact.workingHours // Giả sử đã là object
+    }
+
+
+    let parsedSocialLinks = null
+     if (typeof contact.socialLinks === 'string') {
+      try {
+        parsedSocialLinks = JSON.parse(contact.socialLinks)
+      } catch (e) {
+        console.error("Lỗi parse socialLinks JSON:", e)
+      }
+    } else if (contact.socialLinks) {
+        parsedSocialLinks = contact.socialLinks // Giả sử đã là object
+    }
+
+
+    // Trả về đối tượng đã xử lý
+    return {
+      ...contact,
+      workingHours: parsedWorkingHours,
+      socialLinks: parsedSocialLinks,
+      // Thêm các trường xử lý khác nếu cần, ví dụ: định dạng giờ làm việc
+      workingHoursFormatted: typeof parsedWorkingHours === 'object' && parsedWorkingHours !== null
+        ? Object.entries(parsedWorkingHours).map(([day, time]) => `${day}: ${time}`).join('; ')
+        : typeof contact.workingHours === 'string' ? contact.workingHours : 'N/A', // Fallback nếu workingHours là string đơn giản hoặc không parse được
+      facebookUrl: parsedSocialLinks?.facebook || null,
+      instagramUrl: parsedSocialLinks?.instagram || null,
+      youtubeUrl: parsedSocialLinks?.youtube || null,
+    }
+
+  } catch (error) {
+    console.error("Lỗi khi lấy thông tin liên hệ:", error)
+    return null // Hoặc trả về giá trị mặc định
   }
 }

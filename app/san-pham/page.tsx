@@ -2,76 +2,114 @@ import { Button } from "@/components/ui/button"
 import Image from "next/image"
 import Link from "next/link"
 import prisma from "@/lib/db"
-
-// Đơn giản hóa interface
+import { SearchBar } from "@/components/products/search-bar"
+import { CategoryFilter } from "@/components/products/category-filter"
+import { ProductCard } from "@/components/products/product-card"
+import { ChevronRight } from "lucide-react"
 interface Product {
   id: string
   name: string
   slug: string
   price: number
+  salePrice: number | null
+  featured: boolean
+  inStock: boolean
   images: Array<{ url: string }>
+  category?: {
+    name: string
+    slug: string
+  } | null
 }
 
-export default async function ProductsPage() {
-  // Chỉ lấy sản phẩm đang active
-  const products = await prisma.product.findMany({
-    where: {
-      isActive: true,
-    },
-    include: {
-      images: true,
-    },
-    orderBy: {
-      createdAt: 'desc',
-    },
+interface PageProps {
+  searchParams: {
+    category?: string
+    search?: string
+    sort?: string
+    page?: string
+  }
+}
+
+export default async function ProductsPage({
+  searchParams
+}: PageProps) {
+  // Build where clause
+  const where: any = { isActive: true }
+  
+  if (searchParams.category) {
+    where.category = { slug: searchParams.category }
+  }
+
+  if (searchParams.search) {
+    where.name = {
+      contains: searchParams.search,
+    }
+  }
+
+  // Build orderBy
+  let orderBy: any = { createdAt: 'desc' }
+  if (searchParams.sort === 'price-asc') {
+    orderBy = { price: 'asc' }
+  } else if (searchParams.sort === 'price-desc') {
+    orderBy = { price: 'desc' }
+  }
+
+  // Get categories for filter
+  const categories = await prisma.category.findMany({
+    where: { type: 'PRODUCT', isActive: true },
+    select: { name: true, slug: true }
   })
 
-  // Hàm format giá
-  const formatPrice = (price: number) => {
-    return new Intl.NumberFormat("vi-VN", {
-      style: "currency",
-      currency: "VND",
-      maximumFractionDigits: 0,
-    }).format(price)
-  }
+  // Get products
+  const products = await prisma.product.findMany({
+    where,
+    include: {
+      images: true,
+      category: { select: { name: true, slug: true } }
+    },
+    orderBy,
+    take: 20
+  })
 
   return (
     <div className="min-h-screen bg-black pt-24">
       <div className="container mx-auto px-4 py-16">
-        {/* Header */}
-        <h1 className="mb-2 text-center text-4xl font-bold">Sản Phẩm</h1>
-        <p className="mb-12 text-center text-gray-400">
-          Các sản phẩm chất lượng từ Hoàng Trí Moto
-        </p>
+      <div className="mb-8 flex items-center text-sm text-gray-400">
+          <Link href="/" className="hover:text-red-600">
+            Trang Chủ
+          </Link>
+          <ChevronRight className="mx-2 h-4 w-4" />
+          <span className="text-white">Sản Phẩm</span>
+        </div>
+      <h1 className="mb-2 text-center text-4xl font-bold uppercase">Sản Phẩm</h1>
+      <p className="mb-12 text-center text-gray-400">Các sản phẩm của Hoàng Trí Moto</p>
+
+        {/* Filters */}
+        <div className="mb-8 flex flex-col gap-4 md:flex-row">
+          <SearchBar />
+          <CategoryFilter categories={categories} />
+          <select
+            className="rounded-md bg-zinc-800 px-4 py-2 text-white"
+            defaultValue=""
+          >
+            <option value="">Sắp xếp</option>
+            <option value="price-asc">Giá tăng dần</option>
+            <option value="price-desc">Giá giảm dần</option>
+          </select>
+        </div>
 
         {/* Product Grid */}
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-          {products.map((product) => (
-            <div key={product.id} className="overflow-hidden rounded-lg bg-zinc-900">
-              <Link href={`/san-pham/${product.slug}`}>
-                <div className="relative h-48">
-                  <Image
-                    src={product.images[0]?.url || "/placeholder.png"}
-                    alt={product.name}
-                    fill
-                    className="object-cover transition-transform hover:scale-105"
-                  />
-                </div>
-                <div className="p-4">
-                  <h2 className="mb-2 text-lg font-semibold">{product.name}</h2>
-                  <p className="text-xl font-bold text-red-600">
-                    {formatPrice(Number(product.price))}
-                  </p>
-                  <Button className="mt-4 w-full bg-red-600 hover:bg-red-700">
-                    Xem Chi Tiết
-                  </Button>
-                </div>
-              </Link>
-            </div>
-          ))}
+          {products.map((product) => {
+            const processedProduct = {
+              ...product,
+              price: Number(product.price),
+              salePrice: product.salePrice ? Number(product.salePrice) : null
+            }
+            return <ProductCard key={product.id} product={processedProduct} />
+          })}
         </div>
       </div>
     </div>
   )
 }
-
