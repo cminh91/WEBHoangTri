@@ -6,6 +6,9 @@ import { SearchBar } from "@/components/products/search-bar"
 import { CategoryFilter } from "@/components/products/category-filter"
 import { ProductCard } from "@/components/products/product-card"
 import { ChevronRight } from "lucide-react"
+import { SortSelect } from "@/components/products/sort-select"
+import { NoProductsFound } from "@/components/products/no-products-found"
+
 interface Product {
   id: string
   name: string
@@ -73,42 +76,68 @@ export default async function ProductsPage({
 
   return (
     <div className="min-h-screen bg-black pt-24">
-      <div className="container mx-auto px-4 py-16">
-      <div className="mb-8 flex items-center text-sm text-gray-400">
-          <Link href="/" className="hover:text-red-600">
+      <div className="container mx-auto px-4 py-8 md:py-16">
+        {/* Breadcrumb - Tối ưu cho mobile */}
+        <div className="mb-6 flex items-center text-xs md:text-sm text-gray-400">
+          <Link href="/" className="hover:text-red-600 transition-colors">
             Trang Chủ
           </Link>
-          <ChevronRight className="mx-2 h-4 w-4" />
+          <ChevronRight className="mx-1 md:mx-2 h-3 w-3 md:h-4 md:w-4 flex-shrink-0" />
           <span className="text-white">Sản Phẩm</span>
         </div>
-      <h1 className="mb-2 text-center text-4xl font-bold uppercase">Sản Phẩm</h1>
-      <p className="mb-12 text-center text-gray-400">Các sản phẩm của Hoàng Trí Moto</p>
 
-        {/* Filters */}
-        <div className="mb-8 flex flex-col gap-4 md:flex-row">
-          <SearchBar />
-          <CategoryFilter categories={categories} />
-          <select
-            className="rounded-md bg-zinc-800 px-4 py-2 text-white"
-            defaultValue=""
-          >
-            <option value="">Sắp xếp</option>
-            <option value="price-asc">Giá tăng dần</option>
-            <option value="price-desc">Giá giảm dần</option>
-          </select>
+        {/* Header - Cải thiện spacing và responsive */}
+        <div className="mb-8 md:mb-12">
+          <h1 className="mb-2 text-center text-2xl md:text-4xl font-bold uppercase tracking-wider">
+            Sản Phẩm
+          </h1>
+          <p className="text-center text-sm md:text-base text-gray-400">
+            Các sản phẩm chính hãng của Hoàng Trí Moto
+          </p>
         </div>
 
-        {/* Product Grid */}
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-          {products.map((product) => {
-            const processedProduct = {
-              ...product,
-              price: Number(product.price),
-              salePrice: product.salePrice ? Number(product.salePrice) : null
-            }
-            return <ProductCard key={product.id} product={processedProduct} />
-          })}
+        {/* Filters - Cải thiện responsive và thêm shadow */}
+        <div className="mb-8 p-4 bg-zinc-900/50 rounded-lg shadow-lg">
+          <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+            <div className="flex-1 md:max-w-md">
+              <SearchBar />
+            </div>
+            <div className="flex flex-col sm:flex-row gap-4">
+              <CategoryFilter categories={categories} />
+              <SortSelect currentSort={searchParams.sort} />
+            </div>
+          </div>
         </div>
+
+        {/* Product Grid - Cải thiện spacing và animation */}
+        {products.length > 0 ? (
+          <div className="grid grid-cols-1 gap-4 sm:gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+            {products.map((product) => {
+              const processedProduct = {
+                ...product,
+                price: Number(product.price),
+                salePrice: product.salePrice ? Number(product.salePrice) : null
+              }
+              return (
+                <div key={product.id} className="transform transition-transform hover:scale-[1.02] duration-300">
+                  <ProductCard product={{
+                    id: processedProduct.id,
+                    name: processedProduct.name,
+                    slug: processedProduct.slug,
+                    price: processedProduct.price,
+                    salePrice: processedProduct.salePrice,
+                    featured: processedProduct.featured,
+                    inStock: processedProduct.inStock,
+                    images: processedProduct.images,
+                    category: processedProduct.category
+                  } as Product} />
+                </div>
+              );
+            })}
+          </div>
+        ) : (
+          <NoProductsFound />
+        )}
       </div>
     </div>
   )

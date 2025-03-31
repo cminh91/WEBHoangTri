@@ -8,6 +8,7 @@ import TestimonialsServer from "@/components/about/testimonials-server"
 import { Suspense } from "react"
 import type { Metadata } from "next"
 import Script from "next/script"
+import { getTeamMembers } from "@/lib/queries"
 
 export const metadata: Metadata = {
   title: "Về Chúng Tôi | Hoàng Trí Moto",
@@ -77,6 +78,9 @@ const values = [
 ];
 
 export default async function AboutUsPage() {
+  // Add this line to fetch team members
+  const teamMembers = await getTeamMembers();
+
   return (
     <div className="min-h-screen bg-black pt-24">
       {/* Schema Markup (JSON-LD) cho trang Về chúng tôi */}
@@ -140,11 +144,6 @@ export default async function AboutUsPage() {
             ))}
           </div>
         </div>
-
-        {/* Phần Đội Ngũ được tách thành component riêng */}
-        <Suspense fallback={<div className="h-80 w-full animate-pulse bg-zinc-800 rounded-lg"></div>}>
-          <TeamMembers />
-        </Suspense>
 
         {/* Phần Đánh Giá Khách Hàng */}
         <Suspense fallback={<div className="h-80 w-full animate-pulse bg-zinc-800 rounded-lg"></div>}>
@@ -225,115 +224,4 @@ async function AboutHeroSection() {
       </div>
     </div>
   );
-  
-  const values = [
-    {
-      icon: <Users className="h-12 w-12 text-red-600" />,
-      title: "Khách Hàng Là Trọng Tâm",
-      description: "Chúng tôi luôn đặt nhu cầu và sự hài lòng của khách hàng lên hàng đầu trong mọi hoạt động.",
-    },
-    {
-      icon: <Wrench className="h-12 w-12 text-red-600" />,
-      title: "Chất Lượng Vượt Trội",
-      description: "Cam kết mang đến dịch vụ sửa chữa và sản phẩm chất lượng cao nhất cho khách hàng.",
-    },
-    {
-      icon: <Award className="h-12 w-12 text-red-600" />,
-      title: "Chuyên Nghiệp & Uy Tín",
-      description: "Đội ngũ nhân viên được đào tạo chuyên nghiệp, làm việc với tinh thần trách nhiệm cao.",
-    },
-    {
-      icon: <Clock className="h-12 w-12 text-red-600" />,
-      title: "Nhanh Chóng & Hiệu Quả",
-      description: "Tối ưu hóa quy trình làm việc để đảm bảo thời gian sửa chữa nhanh chóng và hiệu quả.",
-    },
-  ];
-
-  return (
-    <div className="min-h-screen bg-black pt-24">
-      <div className="container mx-auto px-4 py-16">
-        {/* Breadcrumb */}
-        <div className="mb-8 flex items-center text-sm text-gray-400">
-          <Link href="/" className="hover:text-red-600">
-            Trang Chủ
-          </Link>
-          <ChevronRight className="mx-2 h-4 w-4" />
-          <span className="text-white">Về Chúng Tôi</span>
-        </div>
-
-        {/* Hero Section */}
-        <div className="mb-16 grid grid-cols-1 gap-12 md:grid-cols-2">
-          <div>
-            <h1 className="mb-6 text-4xl font-bold uppercase">
-              {aboutData?.title || "Hoàng Trí Moto"}
-              <br />
-              <span className="text-red-600">Đắk Lắk</span>
-            </h1>
-            <div 
-              className="mb-8 text-gray-300"
-              dangerouslySetInnerHTML={{ 
-                __html: aboutData?.content || `                 
-                `
-              }}
-            />
-            <ul className="mb-8 space-y-3">
-              <li className="flex items-center">
-                <CheckCircle className="mr-3 h-5 w-5 text-red-600" />
-                <span>Đội ngũ kỹ thuật viên được đào tạo chuyên nghiệp</span>
-              </li>
-              <li className="flex items-center">
-                <CheckCircle className="mr-3 h-5 w-5 text-red-600" />
-                <span>Trang thiết bị và công cụ hiện đại</span>
-              </li>
-              <li className="flex items-center">
-                <CheckCircle className="mr-3 h-5 w-5 text-red-600" />
-                <span>Phụ tùng chính hãng 100%</span>
-              </li>
-              <li className="flex items-center">
-                <CheckCircle className="mr-3 h-5 w-5 text-red-600" />
-                <span>Bảo hành dài hạn cho mọi dịch vụ</span>
-              </li>
-            </ul>
-            <Button className="bg-red-600 px-8 py-6 text-lg font-semibold text-white hover:bg-red-700">
-              <Link href="/lien-he">Liên Hệ Ngay</Link>
-            </Button>
-          </div>
-          <div className="relative">
-            <div className="absolute -right-4 -top-4 h-full w-full border-t-4 border-r-4 border-red-600"></div>
-            <div className="relative h-full w-full overflow-hidden">
-              <Image
-                src={aboutData?.images?.[0]?.url || "/placeholder.svg?height=600&width=500"}
-                alt={aboutData?.images?.[0]?.alt || "Hoàng Trí Moto"}
-                width={500}
-                height={600}
-                className="h-full w-full object-cover"
-              />
-            </div>
-          </div>
-        </div>
-
-        {/* Our Values */}
-        <div className="mb-16">
-          <h2 className="mb-12 text-center text-3xl font-bold uppercase">Giá Trị Cốt Lõi</h2>
-          <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
-            {values.map((value, index) => (
-              <div key={index} className="rounded-lg bg-zinc-900 p-6 text-center">
-                <div className="mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-zinc-800">
-                  {value.icon}
-                </div>
-                <h3 className="mb-3 text-xl font-bold">{value.title}</h3>
-                <p className="text-gray-400">{value.description}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Phần Đội Ngũ được tách thành component riêng */}
-        <TeamMembers />
-
-        {/* Phần Đánh Giá Khách Hàng */}
-        <TestimonialsServer />
-      </div>
-    </div>
-  )
-} 
+}

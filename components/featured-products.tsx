@@ -3,7 +3,7 @@
 import { useEffect, useState, useMemo, useCallback } from "react"
 import Image from "next/image"
 import Link from "next/link"
-import { Star } from "lucide-react"
+import { Star, ChevronLeft, ChevronRight } from "lucide-react"
 
 interface Product {
   id: string
@@ -13,6 +13,11 @@ interface Product {
   salePrice?: number | null | any
   images?: string[]
   categoryId?: string | null
+  category?: {
+    id: string
+    name: string
+    slug: string
+  } | null
   description: string | null
   isActive: boolean
   featured?: boolean
@@ -20,13 +25,23 @@ interface Product {
   ratingCount?: number
 }
 
-interface FeaturedProductsProps {
-  initialProducts?: Product[]
+interface Category {
+  id: string
+  name: string
+  slug: string
 }
 
-export default function FeaturedProducts({ initialProducts }: FeaturedProductsProps) {
+interface FeaturedProductsProps {
+  initialProducts?: Product[]
+  categories?: Category[]
+}
+
+export default function FeaturedProducts({ initialProducts, categories = [] }: FeaturedProductsProps) {
   const [products, setProducts] = useState<Product[]>([])
   const [loading, setLoading] = useState(!initialProducts)
+  const [activeCategory, setActiveCategory] = useState<string>("all")
+  const [currentPage, setCurrentPage] = useState(0)
+  const productsPerPage = 4
 
   useEffect(() => {
     if (initialProducts && initialProducts.length > 0) {
@@ -37,33 +52,11 @@ export default function FeaturedProducts({ initialProducts }: FeaturedProductsPr
       }))
       setProducts(enhancedProducts)
       setLoading(false)
-      return
+    } else {
+      // Nếu không có initialProducts, hiển thị trạng thái trống
+      setProducts([])
+      setLoading(false)
     }
-
-    const fetchProducts = async () => {
-      try {
-        const response = await fetch('/api/products/featured', {
-          next: { revalidate: 3600 }
-        })
-        if (!response.ok) {
-          throw new Error('Failed to fetch featured products')
-        }
-        const data = await response.json()
-        const enhancedProducts = data.map((product: Product) => ({
-          ...product,
-          rating: product.rating || 5,
-          ratingCount: product.ratingCount || 0
-        }))
-        setProducts(enhancedProducts)
-      } catch (error) {
-        console.error('Error fetching featured products:', error)
-        setProducts([])
-      } finally {
-        setLoading(false)
-      }
-    }
-
-    fetchProducts()
   }, [initialProducts])
 
   const getValidImageUrl = useCallback((images?: string[]) => {
@@ -81,31 +74,55 @@ export default function FeaturedProducts({ initialProducts }: FeaturedProductsPr
     }).format(Number(price))
   }, [])
 
-  const renderRating = useCallback((rating: number = 5) => {
-    const stars = []
-    for (let i = 1; i <= 5; i++) {
-      stars.push(
-        <Star
-          key={i}
-          className={`w-4 h-4 ${i <= rating ? 'text-yellow-400 fill-yellow-400' : 'text-gray-300'}`}
-        />
-      )
-    }
-    return stars
-  }, [])
+  // Filter products by category
+  const filteredProducts = useMemo(() => {
+    if (activeCategory === "all") return products
+    return products.filter(product => 
+      product.category?.slug === activeCategory || 
+      product.categoryId === activeCategory
+    )
+  }, [products, activeCategory])
 
-  // Sử dụng useMemo để tránh re-render không cần thiết
-  const displayedProducts = useMemo(() => {
-    return products.slice(0, 6)
-  }, [products])
+  // Get paginated products
+  const paginatedProducts = useMemo(() => {
+    const start = currentPage * productsPerPage
+    return filteredProducts.slice(start, start + productsPerPage)
+  }, [filteredProducts, currentPage, productsPerPage])
+
+  // Calculate total pages
+  const totalPages = Math.ceil(filteredProducts.length / productsPerPage)
+
+  // Tạo danh sách danh mục từ database và thêm danh mục "Tất cả"
+  const allCategories = useMemo(() => {
+    // Thêm danh mục "Tất cả" vào đầu danh sách
+    return [
+      { id: "all", name: "Tất cả sản phẩm", slug: "all" },
+      ...categories
+    ];
+  }, [categories]);
+
+  // Handle category change
+  const handleCategoryChange = (categorySlug: string) => {
+    setActiveCategory(categorySlug)
+    setCurrentPage(0) // Reset to first page when changing category
+  }
+
+  // Navigation handlers
+  const goToPrevPage = () => {
+    setCurrentPage(prev => Math.max(0, prev - 1))
+  }
+
+  const goToNextPage = () => {
+    setCurrentPage(prev => Math.min(totalPages - 1, prev + 1))
+  }
 
   if (loading) {
     return (
-      <section className="bg-zinc-900 py-16">
+      <section className="bg-black py-16">
         <div className="container mx-auto px-4">
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-            {[...Array(6)].map((_, i) => (
-              <div key={i} className="bg-zinc-800 animate-pulse h-64 rounded-lg"></div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+            {[...Array(4)].map((_, i) => (
+              <div key={i} className="bg-zinc-900 animate-pulse h-64 rounded-lg"></div>
             ))}
           </div>
         </div>
@@ -114,49 +131,99 @@ export default function FeaturedProducts({ initialProducts }: FeaturedProductsPr
   }
 
   return (
-    <section className="bg-zinc-900 py-16">
+    <section className="bg-black py-16">
       <div className="container mx-auto px-4">
-        <h2 className="mb-12 text-center text-3xl font-bold md:text-4xl uppercase">SẢN PHẨM NỔI BẬT</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-          {displayedProducts.map((product) => (
-            <Link 
-              href={`/san-pham/${product.slug}`}
-              key={product.id}
-              className="overflow-hidden rounded-lg bg-zinc-800"
-            >
-              <div className="relative h-48 w-full">
-                <Image 
-                  src={getValidImageUrl(product.images)}
-                  alt={product.name}
-                  fill
-                  sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, 33vw"
-                  loading="lazy"
-                  className="object-cover"
-                />
-              </div>
-              <div className="p-4">
-                <h3 className="mb-2 text-lg font-semibold text-white">{product.name}</h3>
-                <div className="mb-4 flex items-center">
-                  {product.salePrice ? (
-                    <>
-                      <span className="mr-2 text-lg font-bold text-red-500">{formatPrice(product.salePrice)}</span>
-                      <span className="text-sm text-gray-400 line-through">{formatPrice(product.price)}</span>
-                    </>
-                  ) : (
-                    <span className="text-lg font-bold text-red-500">{formatPrice(product.price)}</span>
-                  )}
-                </div>
-                <div className="flex items-center mb-4">
-                  {renderRating(product.rating)}
-                  <span className="text-xs text-gray-400 ml-1">({product.ratingCount || 0})</span>
-                </div>
-                <button className="w-full bg-red-500 hover:bg-red-600 text-white font-bold py-2 rounded">
-                  MUA NGAY
-                </button>
-              </div>
+        <h2 className="text-2xl md:text-3xl font-bold text-white text-center mb-8">SẢN PHẨM NỔI BẬT</h2>
+        
+        <div className="mb-8 overflow-x-auto">
+          <div className="flex min-w-max">
+            {allCategories.map((category, index) => (
+              <button
+                key={category.id}
+                onClick={() => handleCategoryChange(category.slug)}
+                className={`px-6 py-3 text-sm font-medium transition-colors ${
+                  activeCategory === category.slug ? 'bg-red-600 text-white' : 'bg-zinc-800 text-white hover:bg-red-600'
+                } ${index === 0 ? 'rounded-l-md' : ''} ${
+                  index === allCategories.length - 1 ? 'rounded-r-md' : ''
+                }`}
+              >
+                {category.name}
+              </button>
+            ))}
+            <Link href="/san-pham" className="px-6 py-3 text-sm font-medium bg-zinc-800 text-white hover:bg-red-600 transition-colors rounded-r-md">
+              Xem tất cả
             </Link>
-          ))}
+          </div>
         </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+          {paginatedProducts.length > 0 ? (
+            paginatedProducts.map((product) => (
+              <div key={product.id} className="group relative overflow-hidden bg-zinc-900 rounded-lg">
+                <Link href={`/san-pham/${product.slug}`}>
+                  <div className="relative h-48 w-full overflow-hidden">
+                    <Image 
+                      src={getValidImageUrl(product.images)}
+                      alt={product.name}
+                      fill
+                      sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, 25vw"
+                      className="object-cover transition-transform duration-300 group-hover:scale-110"
+                    />
+                    {product.salePrice && product.salePrice < product.price && (
+                      <div className="absolute top-0 right-0 bg-red-600 text-white text-xs font-bold px-2 py-1">
+                        GIẢM GIÁ
+                      </div>
+                    )}
+                  </div>
+                </Link>
+                <div className="p-4">
+                  <Link 
+                    href={`/san-pham/${product.slug}`}
+                    className="block text-center font-medium text-white hover:text-red-500 transition-colors line-clamp-2 h-12"
+                  >
+                    {product.name}
+                  </Link>
+                  <div className="mt-2 text-center">
+                    {product.salePrice && product.salePrice < product.price ? (
+                      <>
+                        <span className="text-lg font-bold text-red-500 mr-2">{formatPrice(product.salePrice)}</span>
+                        <span className="text-sm text-gray-400 line-through">{formatPrice(product.price)}</span>
+                      </>
+                    ) : (
+                      <span className="text-lg font-bold text-red-500">{formatPrice(product.price)}</span>
+                    )}
+                  </div>
+                </div>
+                <div className="absolute bottom-0 left-0 right-0 bg-red-600 text-white text-center py-2 transform translate-y-full group-hover:translate-y-0 transition-transform duration-300">
+                  MUA NGAY
+                </div>
+              </div>
+            ))
+          ) : (
+            <div className="col-span-4 text-center py-8 text-gray-400">
+              Không tìm thấy sản phẩm nào trong danh mục này
+            </div>
+          )}
+        </div>
+
+        {totalPages > 1 && (
+          <div className="flex justify-center mt-8 gap-2">
+            <button 
+              onClick={goToPrevPage} 
+              disabled={currentPage === 0}
+              className="p-2 rounded-full bg-zinc-800 text-white disabled:opacity-50 hover:bg-red-600 transition-colors"
+            >
+              <ChevronLeft className="h-5 w-5" />
+            </button>
+            <button 
+              onClick={goToNextPage} 
+              disabled={currentPage >= totalPages - 1}
+              className="p-2 rounded-full bg-zinc-800 text-white disabled:opacity-50 hover:bg-red-600 transition-colors"
+            >
+              <ChevronRight className="h-5 w-5" />
+            </button>
+          </div>
+        )}
       </div>
     </section>
   )

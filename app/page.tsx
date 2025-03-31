@@ -10,6 +10,7 @@ const StatsCounter = dynamic(() => import("@/components/stats-counter"))
 const TrustedPartners = dynamic(() => import("@/components/trusted-partners"), {
   loading: () => <div className="py-16 bg-black" />
 })
+
 const SpecialServices = dynamic(() => import("@/components/special-services"), {
   loading: () => <section className="bg-black py-16"><div className="container mx-auto px-4">Loading services...</div></section>
 })
@@ -20,6 +21,10 @@ const FeaturedProducts = dynamic(() => import("@/components/featured-products"),
   loading: () => <div className="py-16 bg-black" />
 })
 const NewsSection = dynamic(() => import("@/components/news-section"))
+// Add this import near the top with other dynamic imports
+const TeamSlider = dynamic(() => import("@/components/about/team-slider"), {
+  loading: () => <div className="py-16 bg-black" />
+})
 import {
   getSliders,
   getCategories,
@@ -28,7 +33,7 @@ import {
   getLatestNews,
   getStoreInfo,
   getFeaturedServices,
-  getPartners
+  getPartners,
 } from "@/lib/queries"
 import { SliderDisplayProps } from "@/components/slider/slider-display"
 
@@ -42,7 +47,7 @@ export default async function Home() {
     newsData,
     storeInfo,
     services,
-    partners
+    partners,
   ] = await Promise.all([
     getSliders(),
     getCategories(),
@@ -51,7 +56,8 @@ export default async function Home() {
     getLatestNews(),
     getStoreInfo(),
     getFeaturedServices(),
-    getPartners()
+    getPartners(),
+    // Remove getProductCategories()
   ])
 
   // Format dữ liệu slider
@@ -70,7 +76,12 @@ export default async function Home() {
     ...product,
     slug: product.name.toLowerCase().replace(/\s+/g, '-'),
     description: "Mô tả sản phẩm",
-    isActive: true
+    isActive: true,
+    // Thêm id vào category nếu category tồn tại
+    category: product.category ? {
+      ...product.category,
+      id: product.categoryId || 'unknown-category-id'
+    } : null
   }))
 
   // Format dữ liệu team members
@@ -98,6 +109,8 @@ const formattedServices = services.map(service => ({
     website: partner.website,
     order: partner.order
   }))
+
+
   // Format dữ liệu news
   const formattedNews = newsData.map(news => ({
     ...news,
@@ -112,20 +125,20 @@ const formattedServices = services.map(service => ({
   return (
     <main className="flex min-h-screen flex-col">
       <SliderDisplay sliders={formattedSliders} />
-
       <WhyChooseUs />
-
       <SpecialServices initialServices={formattedServices} />
-
       <YouTubeSection videoId={storeInfo.youtubeVideoId} />
       <CategoryGrid categories={categories} />
-      <FeaturedProducts initialProducts={formattedProducts} />
+      <FeaturedProducts 
+        initialProducts={formattedProducts} 
+        categories={categories}
+      />
       <NewsSection initialNews={formattedNews} />
       <StatsCounter />
       <TrustedPartners initialPartners={formattedPartners} />
+      <TeamSlider teamMembers={formattedTeam} />
       <TeamMembers teamMembers={formattedTeam} />
       <PricingSection />
-
     </main>
   )
 }

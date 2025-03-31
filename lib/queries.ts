@@ -1,5 +1,5 @@
 import prisma from "./prisma"
-import { Product, Service } from "../types"
+import { Product, Service, } from "../types"
 
 if (!prisma) {
   throw new Error("Prisma client không được khởi tạo")
@@ -59,6 +59,7 @@ export async function getCategories() {
     return []
   }
 }
+
 
 // Fetch featured products
 export async function getFeaturedProducts() {
@@ -442,10 +443,10 @@ export async function getContactInfo() {
       ...contact,
       workingHours: parsedWorkingHours,
       socialLinks: parsedSocialLinks,
-      // Thêm các trường xử lý khác nếu cần, ví dụ: định dạng giờ làm việc
+      // Thêm các trường xử lý khác nếu cần, ví dụng: định dạng giờ làm việc
       workingHoursFormatted: typeof parsedWorkingHours === 'object' && parsedWorkingHours !== null
         ? Object.entries(parsedWorkingHours).map(([day, time]) => `${day}: ${time}`).join('; ')
-        : typeof contact.workingHours === 'string' ? contact.workingHours : 'N/A', // Fallback nếu workingHours là string đơn giản hoặc không parse được
+        : typeof contact.workingHours === 'string' ? contact.workingHours : 'N/A', // Fallback nếu workingHours là string đơn giảm hoặc không parse được
       facebookUrl: parsedSocialLinks?.facebook || null,
       instagramUrl: parsedSocialLinks?.instagram || null,
       youtubeUrl: parsedSocialLinks?.youtube || null,
