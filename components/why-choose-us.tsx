@@ -1,12 +1,24 @@
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
+import prisma from "@/lib/db"
 
-export default function WhyChooseUs() {
+export default async function WhyChooseUs() {
+  // Fetch about data from database
+  const aboutData = await prisma.about.findFirst({
+    select: {
+      title: true,
+      content: true,
+      images: {
+        take: 1
+      }
+    }
+  })
+
   const benefits = [
-    "Kỹ thuật viên được chứng nhận",
-    "Dịch vụ sửa chữa toàn diện",
-    "900 Đánh giá năm sao",
-    "Bảo hành sửa chữa",
+    "Đội ngũ kỹ thuật viên được đào tạo chuyên nghiệp",
+    "Trang thiết bị và công cụ hiện đại", 
+    "Phụ tùng chính hãng 100%",
+    "Bảo hành dài hạn cho mọi dịch vụ"
   ]
 
   return (
@@ -14,15 +26,17 @@ export default function WhyChooseUs() {
       <div className="container mx-auto px-4">
         <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
           <div>
-            <h2 className="mb-6 text-4xl font-bold uppercase">
-              Tại sao lại chọn
-              <br />
-              chúng tôi
+            {/* Remove uppercase and font-bold from title to preserve Word formatting */}
+            <h2 className="mb-6 text-4xl">
+              {aboutData?.title || "Tại sao lại chọn chúng tôi"}
             </h2>
-            <p className="mb-8 text-gray-400">
-              Chúng tôi luôn mang đến lợi ích cho bạn thế nên chuyên môn cao, cũng như sự tâm huyết của chúng tôi, chỉ
-              mong nhận được sự hài lòng của bạn
-            </p>
+            {/* Remove text-gray-400 to preserve Word text color */}
+            <div 
+              className="mb-8"
+              dangerouslySetInnerHTML={{
+                __html: aboutData?.content || ""
+              }}
+            />
             <ul className="mb-8 space-y-6">
               {benefits.map((benefit, index) => (
                 <li key={index} className="text-xl font-semibold">
@@ -36,7 +50,7 @@ export default function WhyChooseUs() {
             <div className="absolute -right-4 -top-4 h-full w-full border-t-4 border-r-4 border-red-600"></div>
             <div className="relative h-full w-full overflow-hidden">
               <Image
-                src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-NCSOIMt5tVcwqSPMHUlqhrxp8aitCf.png"
+                src={aboutData?.images?.[0]?.url || "/placeholder.svg"}
                 alt="Motorcycle mechanic"
                 width={600}
                 height={500}

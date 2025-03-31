@@ -3,7 +3,6 @@ import { CheckCircle, ChevronRight, Users, Wrench, Award, Clock } from "lucide-r
 import Image from "next/image"
 import Link from "next/link"
 import prisma from "@/lib/db"
-import TeamMembers from "@/components/about/team-members"
 import TestimonialsServer from "@/components/about/testimonials-server"
 import { Suspense } from "react"
 import type { Metadata } from "next"
@@ -172,56 +171,102 @@ async function AboutHeroSection() {
   }
 
   return (
-    <div className="mb-16 grid grid-cols-1 gap-12 md:grid-cols-2">
-      <div>
-        <h1 className="mb-6 text-4xl font-bold uppercase">
-          {aboutData?.title || "Hoàng Trí Moto"}
-          <br />
-          <span className="text-red-600">Đắk Lắk</span>
-        </h1>
-        <div
-          className="mb-8 text-gray-300"
-          dangerouslySetInnerHTML={{
-            __html: aboutData?.content || `
-              <p>Hoàng Trí Moto tự hào là đơn vị hàng đầu trong lĩnh vực sửa chữa, bảo dưỡng và độ xe mô tô tại Đắk Lắk. Với đội ngũ kỹ thuật viên giàu kinh nghiệm và trang thiết bị hiện đại, chúng tôi cam kết mang đến dịch vụ chất lượng cao nhất cho khách hàng.</p>
-              <p>Thành lập từ năm 2010, Hoàng Trí Moto đã không ngừng phát triển và khẳng định vị thế trên thị trường. Chúng tôi tự hào về sự tin tưởng và ủng hộ của hàng nghìn khách hàng trong suốt thời gian qua.</p>
-            `
-          }}
-        />
-        <ul className="mb-8 space-y-3">
-          <li className="flex items-center">
-            <CheckCircle className="mr-3 h-5 w-5 text-red-600" />
-            <span>Đội ngũ kỹ thuật viên được đào tạo chuyên nghiệp</span>
-          </li>
-          <li className="flex items-center">
-            <CheckCircle className="mr-3 h-5 w-5 text-red-600" />
-            <span>Trang thiết bị và công cụ hiện đại</span>
-          </li>
-          <li className="flex items-center">
-            <CheckCircle className="mr-3 h-5 w-5 text-red-600" />
-            <span>Phụ tùng chính hãng 100%</span>
-          </li>
-          <li className="flex items-center">
-            <CheckCircle className="mr-3 h-5 w-5 text-red-600" />
-            <span>Bảo hành dài hạn cho mọi dịch vụ</span>
-          </li>
-        </ul>
-        <Button className="bg-red-600 px-8 py-6 text-lg font-semibold text-white hover:bg-red-700">
-          <Link href="/lien-he">Liên Hệ Ngay</Link>
-        </Button>
-      </div>
-      <div className="relative">
-        <div className="absolute -right-4 -top-4 h-full w-full border-t-4 border-r-4 border-red-600"></div>
-        <div className="relative h-full w-full overflow-hidden">
-          <Image
-            src={aboutData?.images?.[0]?.url || "/placeholder.svg?height=600&width=500"}
-            alt={aboutData?.images?.[0]?.alt || "Hoàng Trí Moto"}
-            width={500}
-            height={600}
-            className="h-full w-full object-cover"
+    <>
+      <div className="mb-16 grid grid-cols-1 gap-12 md:grid-cols-2">
+        <div>
+          <h1 className="mb-6 text-4xl font-bold uppercase">
+            {aboutData?.title || "Hoàng Trí Moto"}
+            <br />
+            <span className="text-red-600">Hoàng Trí Đắk Lắk</span>
+          </h1>
+          <div
+            className="mb-8 text-gray-300"
+            dangerouslySetInnerHTML={{
+              __html: aboutData?.content || `
+          
+              `
+            }}
           />
+          <ul className="mb-8 space-y-3">
+            <li className="flex items-center">
+              <CheckCircle className="mr-3 h-5 w-5 text-red-600" />
+              <span>Đội ngũ kỹ thuật viên được đào tạo chuyên nghiệp</span>
+            </li>
+            <li className="flex items-center">
+              <CheckCircle className="mr-3 h-5 w-5 text-red-600" />
+              <span>Trang thiết bị và công cụ hiện đại</span>
+            </li>
+            <li className="flex items-center">
+              <CheckCircle className="mr-3 h-5 w-5 text-red-600" />
+              <span>Phụ tùng chính hãng 100%</span>
+            </li>
+            <li className="flex items-center">
+              <CheckCircle className="mr-3 h-5 w-5 text-red-600" />
+              <span>Bảo hành dài hạn cho mọi dịch vụ</span>
+            </li>
+          </ul>
+          <Button className="bg-red-600 px-8 py-6 text-lg font-semibold text-white hover:bg-red-700">
+            <Link href="/lien-he">Liên Hệ Ngay</Link>
+          </Button>
+        </div>
+        <div className="relative">
+          <div className="absolute -right-4 -top-4 h-full w-full border-t-4 border-r-4 border-red-600"></div>
+          <div className="relative h-full w-full overflow-hidden">
+            <Image
+              src={aboutData?.images?.[0]?.url || "/placeholder.svg"}
+              alt={aboutData?.images?.[0]?.alt || "Hoàng Trí Moto"}
+              width={600}
+              height={500}
+              className="h-full w-full object-cover"
+              priority
+            />
+            <div className="absolute bottom-8 right-8 h-20 w-20 rounded-full bg-white p-2">
+              <div className="flex h-full w-full items-center justify-center rounded-full border-2 border-red-600">
+                <span className="text-xl font-bold text-red-600">HT</span>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
-    </div>
+
+      {/* Sứ mệnh */}
+      {aboutData?.mission && (
+        <div className="mb-16">
+          <h2 className="mb-8 text-center text-3xl font-bold uppercase">Sứ Mệnh</h2>
+          <div className="rounded-lg bg-zinc-900 p-8">
+            <div 
+              className="text-gray-300"
+              dangerouslySetInnerHTML={{ __html: aboutData.mission }}
+            />
+          </div>
+        </div>
+      )}
+
+      {/* Tầm nhìn */}
+      {aboutData?.vision && (
+        <div className="mb-16">
+          <h2 className="mb-8 text-center text-3xl font-bold uppercase">Tầm Nhìn</h2>
+          <div className="rounded-lg bg-zinc-900 p-8">
+            <div 
+              className="text-gray-300"
+              dangerouslySetInnerHTML={{ __html: aboutData.vision }}
+            />
+          </div>
+        </div>
+      )}
+
+      {/* Lịch sử phát triển */}
+      {aboutData?.history && (
+        <div className="mb-16">
+          <h2 className="mb-8 text-center text-3xl font-bold uppercase">Lịch Sử Phát Triển</h2>
+          <div className="rounded-lg bg-zinc-900 p-8">
+            <div 
+              className="text-gray-300"
+              dangerouslySetInnerHTML={{ __html: aboutData.history }}
+            />
+          </div>
+        </div>
+      )}
+    </>
   );
 }

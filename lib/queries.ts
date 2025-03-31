@@ -320,7 +320,14 @@ function parseSocialLinks(socialLinks: any) {
 // Fetch store info
 export async function getStoreInfo() {
   try {
-    const storeInfo = await prisma.storeInfo.findFirst();
+    const storeInfo = await prisma.storeInfo.findFirst({
+      select: {
+        name: true,
+        logo: true,
+        hotline: true,
+        footer: true, // Add footer field
+      }
+    });
     const contactInfo = await prisma.contact.findFirst();
     const socialLinks = parseSocialLinks(contactInfo?.socialLinks);
 
@@ -341,7 +348,8 @@ export async function getStoreInfo() {
       youtubeVideoId: socialLinks?.youtube
         ? socialLinks.youtube.split('v=')[1] || ""
         : "",
-      logoUrl: storeInfo?.logo || "/logo.png"
+      logoUrl: storeInfo?.logo || "/logo.png",
+      footer: storeInfo?.footer || "Moto Edit là nhà phân phối các thiết bị và phụ kiện xe máy chính hãng" // Add footer with default value
     };
   } catch (error) {
     console.error("Failed to fetch store info:", error)
@@ -355,7 +363,8 @@ export async function getStoreInfo() {
       instagramUrl: "https://instagram.com", 
       youtubeUrl: "https://youtube.com",
       youtubeVideoId: "",
-      logoUrl: "/logo.png"
+      logoUrl: "/logo.png",
+      footer: "Moto Edit là nhà phân phối các thiết bị và phụ kiện xe máy chính hãng" // Add default footer
     }
   }
 }

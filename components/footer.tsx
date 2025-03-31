@@ -19,14 +19,17 @@ interface FooterProps {
   storeInfo?: {
     name?: string
     logoUrl?: string
-  }
+    footer?: string
+    logo?: string
+  } | null
   contactInfo?: ContactInfoType | null
 }
 
 export default function Footer({ storeInfo, contactInfo }: FooterProps) {
   const displayData = {
-    name: storeInfo?.name || "MOTO EDIT",
-    logoUrl: storeInfo?.logoUrl || "/logo.png",
+    name: storeInfo?.name || "N/A",
+    logoUrl: storeInfo?.logoUrl || storeInfo?.logo || "/logo.png",
+    footer: storeInfo?.footer || "Moto Edit là nhà phân phối các thiết bị và phụ kiện xe máy chính hãng",
     address: contactInfo?.address || "N/A",
     phone: contactInfo?.phone || "N/A",
     email: contactInfo?.email || "N/A",
@@ -39,7 +42,6 @@ export default function Footer({ storeInfo, contactInfo }: FooterProps) {
   return (
     <footer className="bg-gray-900 text-white">
       <div className="container mx-auto px-4 py-12">
-        {/* Giữ nguyên phần JSX cũ */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {/* Company Info */}
           <div>
@@ -54,9 +56,12 @@ export default function Footer({ storeInfo, contactInfo }: FooterProps) {
                 />
               </Link>
             </div>
-            <p className="text-gray-400 mb-6">
-              Moto Edit là nhà phân phối các thiết bị và phụ kiện xe máy chính hãng
-            </p>
+            <div 
+              className="text-gray-400 mb-6"
+              dangerouslySetInnerHTML={{ 
+                __html: displayData.footer || "Moto Edit là nhà phân phối các thiết bị và phụ kiện xe máy chính hãng"
+              }} 
+            />
             <div className="flex space-x-4">
               <a href={displayData.facebookUrl} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white">
                 <Facebook />
@@ -125,7 +130,11 @@ export default function Footer({ storeInfo, contactInfo }: FooterProps) {
 
         {/* Copyright */}
         <div className="mt-12 pt-6 border-t border-gray-800 text-center text-gray-400">
-          <p>© {new Date().getFullYear()} {displayData.name}. All rights reserved.</p>
+          <div 
+            dangerouslySetInnerHTML={{ 
+              __html: displayData.footer || `© ${new Date().getFullYear()} ${displayData.name}. All rights reserved.` 
+            }} 
+          />
         </div>
       </div>
     </footer>

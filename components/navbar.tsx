@@ -52,55 +52,43 @@ function MenuItem({ category, basePath }: { category: Category, basePath: string
 }
 
 // Mobile menu item component with accordion-style dropdowns
-function MobileMenuItem({ category, basePath, isOpen, toggleOpen }: 
-  { category: Category, basePath: string, isOpen: boolean, toggleOpen: () => void }) {
+function MobileMenuItem({ category, basePath, depth = 0 }: { category: Category, basePath: string, depth?: number }) {
+  const [isOpen, setIsOpen] = useState(false)
   
   return (
     <li className="border-b border-zinc-800">
       <div className="flex items-center justify-between">
         <Link
-          href={`${basePath}${category.slug ? `/${category.slug}` : ''}`}
+          href={`${basePath}?category=${category.slug}`}
           className="block py-3 text-white flex-grow"
+          style={{ paddingLeft: `${depth * 1}rem` }}
         >
           {category.name}
         </Link>
         {category.children?.length > 0 && (
           <button 
-            onClick={toggleOpen}
-            className="p-2 text-white"
+            onClick={() => setIsOpen(!isOpen)}
+            className="px-4 py-2 text-white text-xl font-bold"
           >
-            <ChevronDown className={`h-5 w-5 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+            {isOpen ? '-' : '+'}
           </button>
         )}
       </div>
       
       {category.children?.length > 0 && isOpen && (
-        <ul className="pl-4 border-t border-zinc-800 bg-zinc-900/50">
-          {category.children.map(child => {
-            const [isChildOpen, setIsChildOpen] = useState(false);
-            return (
-              <MobileMenuItem
-                key={child.id}
-                category={child}
-                basePath={basePath}
-                isOpen={isChildOpen}
-                toggleOpen={() => setIsChildOpen(!isChildOpen)}
-              />
-            );
-          })}
+        <ul className="bg-zinc-900/50">
+          {category.children.map(child => (
+            <MobileMenuItem
+              key={child.id}
+              category={child}
+              basePath={basePath}
+              depth={depth + 1}
+            />
+          ))}
         </ul>
       )}
     </li>
   )
-}
-
-interface NavbarProps {
-  storeInfo: StoreInfo
-  categories: {
-    products: Category[]
-    services: Category[]
-    news: Category[]
-  }
 }
 
 export default function Navbar({ storeInfo, categories }: NavbarProps) {
@@ -146,6 +134,26 @@ export default function Navbar({ storeInfo, categories }: NavbarProps) {
               </Link>
             </li>
 
+            <li>
+              <Link href="/ve-chung-toi" className="text-sm font-medium text-white hover:text-red-600 transition-colors">
+                Về Chúng Tôi
+              </Link>
+            </li>
+
+            <li className="group relative">
+              <Link href="/san-pham" className="flex items-center text-sm font-medium text-white hover:text-red-600 transition-colors">
+                Sản Phẩm
+                {productCategories?.length > 0 && <ChevronDown className="ml-1 h-4 w-4" />}
+              </Link>
+              {productCategories?.length > 0 && (
+                <ul className="hidden group-hover:block absolute left-0 top-full bg-black/95 py-2 shadow-lg min-w-[200px] z-50">
+                  {productCategories.map(category => (
+                    <MenuItem key={category.id} category={category} basePath="/san-pham" />
+                  ))}
+                </ul>
+              )}
+            </li>
+
             <li className="group relative">
               <Link href="/dich-vu" className="flex items-center text-sm font-medium text-white hover:text-red-600 transition-colors">
                 Dịch Vụ
@@ -161,30 +169,6 @@ export default function Navbar({ storeInfo, categories }: NavbarProps) {
             </li>
 
             <li className="group relative">
-              <Link href="/san-pham" className="flex items-center text-sm font-medium text-white hover:text-red-600 transition-colors">
-                Sản Phẩm
-                {productCategories?.length > 0 && <ChevronDown className="ml-1 h-4 w-4" />}
-              </Link>
-              {productCategories?.length > 0 && (
-                <ul className="hidden group-hover:block absolute left-0 top-full bg-black/95 py-2 shadow-lg min-w-[200px] z-50">
-                  {productCategories.map(category => (
-                    <MenuItem
-                      key={category.id}
-                      category={category}
-                      basePath="/san-pham"
-                    />
-                  ))}
-                </ul>
-              )}
-            </li>
-
-            <li>
-              <Link href="/ve-chung-toi" className="text-sm font-medium text-white hover:text-red-600 transition-colors">
-                Về Chúng Tôi
-              </Link>
-            </li>
-
-            <li className="group relative">
               <Link href="/tin-tuc" className="flex items-center text-sm font-medium text-white hover:text-red-600 transition-colors">
                 Tin Tức
                 {newsCategories?.length > 0 && <ChevronDown className="ml-1 h-4 w-4" />}
@@ -192,14 +176,16 @@ export default function Navbar({ storeInfo, categories }: NavbarProps) {
               {newsCategories?.length > 0 && (
                 <ul className="hidden group-hover:block absolute left-0 top-full min-w-[200px] bg-black/95 py-2 shadow-lg z-50">
                   {newsCategories.map(category => (
-                    <MenuItem
-                      key={category.id}
-                      category={category}
-                      basePath="/tin-tuc"
-                    />
+                    <MenuItem key={category.id} category={category} basePath="/tin-tuc" />
                   ))}
                 </ul>
               )}
+            </li>
+
+            <li>
+              <Link href="/lien-he" className="text-sm font-medium text-white hover:text-red-600 transition-colors">
+                Liên Hệ
+              </Link>
             </li>
           </ul>
         </nav>
@@ -233,89 +219,88 @@ export default function Navbar({ storeInfo, categories }: NavbarProps) {
                 <Link href="/" className="block text-white">Trang Chủ</Link>
               </li>
               
-              {/* Services with dropdown */}
-              <li className="py-3">
-                <div className="flex items-center justify-between">
-                  <Link href="/dich-vu" className="block text-white flex-grow">Dịch Vụ</Link>
-                  {serviceCategories?.length > 0 && (
-                    <button 
-                      onClick={() => toggleCategory('services')}
-                      className="p-2 text-white"
-                    >
-                      <ChevronDown className={`h-5 w-5 transition-transform ${openCategories.services ? 'rotate-180' : ''}`} />
-                    </button>
-                  )}
-                </div>
-                {serviceCategories?.length > 0 && openCategories.services && (
-                  <ul className="mt-2 pl-4 border-t border-zinc-800 pt-2">
-                    {serviceCategories.map(category => (
-                      <li key={category.id} className="py-2">
-                        <Link href={`/dich-vu/${category.slug}`} className="block text-gray-300 hover:text-white">
-                          {category.name}
-                        </Link>
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </li>
-              
-              {/* Products with dropdown */}
+              {/* Products with nested categories */}
               <li className="py-3">
                 <div className="flex items-center justify-between">
                   <Link href="/san-pham" className="block text-white flex-grow">Sản Phẩm</Link>
                   {productCategories?.length > 0 && (
                     <button 
                       onClick={() => toggleCategory('products')}
-                      className="p-2 text-white"
+                      className="px-4 py-2 text-white text-xl font-bold"
                     >
-                      <ChevronDown className={`h-5 w-5 transition-transform ${openCategories.products ? 'rotate-180' : ''}`} />
+                      {openCategories.products ? '-' : '+'}
                     </button>
                   )}
                 </div>
-                // In the mobile menu section, update the category links:
                 {productCategories?.length > 0 && openCategories.products && (
-                  <ul className="mt-2 pl-4 border-t border-zinc-800 pt-2">
+                  <ul className="mt-2 border-t border-zinc-800 pt-2">
                     {productCategories.map(category => (
-                      <li key={category.id} className="py-2">
-                        <Link href={`/san-pham?category=${category.slug}`} className="block text-gray-300 hover:text-white">
-                          {category.name}
-                        </Link>
-                      </li>
+                      <MobileMenuItem
+                        key={category.id}
+                        category={category}
+                        basePath="/san-pham"
+                      />
                     ))}
                   </ul>
                 )}
               </li>
-              
+
+              {/* Services with nested categories */}
               <li className="py-3">
-                <Link href="/ve-chung-toi" className="block text-white">Về Chúng Tôi</Link>
+                <div className="flex items-center justify-between">
+                  <Link href="/dich-vu" className="block text-white flex-grow">Dịch Vụ</Link>
+                  {serviceCategories?.length > 0 && (
+                    <button 
+                      onClick={() => toggleCategory('services')}
+                      className="px-4 py-2 text-white text-xl font-bold"
+                    >
+                      {openCategories.services ? '-' : '+'}
+                    </button>
+                  )}
+                </div>
+                {serviceCategories?.length > 0 && openCategories.services && (
+                  <ul className="mt-2 border-t border-zinc-800 pt-2">
+                    {serviceCategories.map(category => (
+                      <MobileMenuItem
+                        key={category.id}
+                        category={category}
+                        basePath="/dich-vu"
+                      />
+                    ))}
+                  </ul>
+                )}
               </li>
-              
-              {/* News with dropdown */}
+
+              {/* News with nested categories */}
               <li className="py-3">
                 <div className="flex items-center justify-between">
                   <Link href="/tin-tuc" className="block text-white flex-grow">Tin Tức</Link>
                   {newsCategories?.length > 0 && (
                     <button 
                       onClick={() => toggleCategory('news')}
-                      className="p-2 text-white"
+                      className="px-4 py-2 text-white text-xl font-bold"
                     >
-                      <ChevronDown className={`h-5 w-5 transition-transform ${openCategories.news ? 'rotate-180' : ''}`} />
+                      {openCategories.news ? '-' : '+'}
                     </button>
                   )}
                 </div>
                 {newsCategories?.length > 0 && openCategories.news && (
-                  <ul className="mt-2 pl-4 border-t border-zinc-800 pt-2">
+                  <ul className="mt-2 border-t border-zinc-800 pt-2">
                     {newsCategories.map(category => (
-                      <li key={category.id} className="py-2">
-                        <Link href={`/tin-tuc/${category.slug}`} className="block text-gray-300 hover:text-white">
-                          {category.name}
-                        </Link>
-                      </li>
+                      <MobileMenuItem
+                        key={category.id}
+                        category={category}
+                        basePath="/tin-tuc"
+                      />
                     ))}
                   </ul>
                 )}
               </li>
-              
+
+              <li className="py-3">
+                <Link href="/lien-he" className="block text-white">Liên Hệ</Link>
+              </li>
+
               {/* Mobile cart and hotline */}
               <li className="py-3 flex flex-col gap-3">
                 <CartButton />
@@ -332,4 +317,13 @@ export default function Navbar({ storeInfo, categories }: NavbarProps) {
       )}
     </header>
   )
+}
+
+interface NavbarProps {
+  storeInfo: StoreInfo
+  categories: {
+    products: Category[]
+    services: Category[]
+    news: Category[]
+  }
 }

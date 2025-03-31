@@ -21,6 +21,8 @@ interface StoreInfo {
   name: string
   logo?: string
   hotline?: string
+  footer?: string  // Add footer field
+  logoUrl?: string // Add logoUrl field
 }
 
 interface ClientMainLayoutProps {
@@ -55,12 +57,14 @@ export default function ClientMainLayout({
           storeInfo={storeInfo || {
             name: '',
             logo: '',
-            hotline: ''
+            hotline: '',
+            footer: '',
+            logoUrl: ''
           }} 
         />
       )}
       {children}
-      {!isAdminPage && <Footer contactInfo={contactInfo ?? undefined} />}
+      {!isAdminPage && <Footer storeInfo={storeInfo} contactInfo={contactInfo ?? undefined} />}
     </CartProvider>
   )
 }
