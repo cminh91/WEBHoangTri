@@ -104,7 +104,6 @@ export async function getFeaturedProducts() {
 // Fetch all categories with hierarchy
 export async function getAllCategories() {
   try {
-    console.log('Fetching all active categories from database...')
     const allCategories = await prisma.category.findMany({
       where: { isActive: true },
       orderBy: [
@@ -127,7 +126,6 @@ export async function getAllCategories() {
         }
       }
     })
-    console.log('Raw categories data:', JSON.stringify(allCategories, null, 2))
 
     // Build category tree
     const categoryMap = new Map<string, any>()
@@ -401,7 +399,6 @@ export async function getTeamMembers() {
 
 // Fetch contact info
 export async function getContactInfo() {
-  console.log('Fetching contact info from database...')
   try {
     const contact = await prisma.contact.findFirst({
       select: {
@@ -418,7 +415,6 @@ export async function getContactInfo() {
     })
 
     if (!contact) {
-      console.warn("Không tìm thấy thông tin liên hệ.")
       return null // Hoặc trả về giá trị mặc định
     }
 
@@ -464,5 +460,32 @@ export async function getContactInfo() {
   } catch (error) {
     console.error("Lỗi khi lấy thông tin liên hệ:", error)
     return null // Hoặc trả về giá trị mặc định
+  }
+}
+
+// Add this function to fetch policies
+// Fetch policies
+export async function getPolicies() {
+  try {
+    const policies = await prisma.policy.findMany({
+      where: {
+        isPublished: true
+      },
+      select: {
+        id: true,
+        title: true,
+        slug: true,
+        excerpt: true,
+        order: true
+      },
+      orderBy: {
+        order: 'asc'
+      }
+    });
+    
+    return policies;
+  } catch (error) {
+    console.error("Failed to fetch policies:", error);
+    return [];
   }
 }

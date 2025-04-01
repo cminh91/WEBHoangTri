@@ -21,10 +21,11 @@ interface StoreInfo {
   name: string
   logo?: string
   hotline?: string
-  footer?: string  // Add footer field
-  logoUrl?: string // Add logoUrl field
+  footer?: string
+  logoUrl?: string
 }
 
+// Update the policies interface to match your actual model
 interface ClientMainLayoutProps {
   children: React.ReactNode
   contactInfo?: ContactInfo | null
@@ -34,13 +35,21 @@ interface ClientMainLayoutProps {
     news: Category[]
   } | null
   storeInfo?: StoreInfo | null
+  policies?: Array<{
+    id: string
+    title: string
+    slug: string
+    excerpt?: string | null
+    order?: number
+  }> | null
 }
 
 export default function ClientMainLayout({ 
   children,
   contactInfo,
   categories,
-  storeInfo
+  storeInfo,
+  policies
 }: ClientMainLayoutProps) {
   const pathname = usePathname()
   const isAdminPage = pathname?.startsWith('/admin')
@@ -64,7 +73,7 @@ export default function ClientMainLayout({
         />
       )}
       {children}
-      {!isAdminPage && <Footer storeInfo={storeInfo} contactInfo={contactInfo ?? undefined} />}
+      {!isAdminPage && <Footer contactInfo={contactInfo ?? undefined} storeInfo={storeInfo} policies={policies} />}
     </CartProvider>
   )
 }

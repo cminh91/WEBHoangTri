@@ -57,6 +57,9 @@ export default async function ProductsPage({
     orderBy = { price: 'desc' }
   }
 
+  // Lấy giá trị sort hiện tại và chuyển thành string
+  const currentSort = searchParams.sort ? String(searchParams.sort) : '';
+
   // Get categories for filter
   const categories = await prisma.category.findMany({
     where: { type: 'PRODUCT', isActive: true },
@@ -104,7 +107,7 @@ export default async function ProductsPage({
             </div>
             <div className="flex flex-col sm:flex-row gap-4">
               <CategoryFilter categories={categories} />
-              <SortSelect currentSort={searchParams.sort} />
+              <SortSelect currentSort={currentSort} />
             </div>
           </div>
         </div>

@@ -22,7 +22,7 @@ interface Category {
   slug: string
   type: string
   parentId: string | null
-  children: Category[]
+  children?: Category[]
 }
 
 function MenuItem({ category, basePath }: { category: Category, basePath: string }) {
@@ -33,12 +33,12 @@ function MenuItem({ category, basePath }: { category: Category, basePath: string
         className="flex items-center justify-between px-4 py-2 hover:bg-red-600 text-sm text-white transition-colors"
       >
         {category.name}
-        {category.children?.length > 0 && <ChevronRight className="h-4 w-4 ml-2" />}
+        {category.children && category.children.length > 0 && <ChevronRight className="h-4 w-4 ml-2" />}
       </Link>
       
-      {category.children?.length > 0 && (
+      {category.children && category.children.length > 0 && (
         <ul className="hidden group-hover:block absolute left-full top-0 min-w-[200px] bg-black/95 py-2 shadow-lg z-50">
-          {category.children.map(child => (
+          {category.children?.map(child => (
             <MenuItem
               key={child.id}
               category={child}
@@ -65,7 +65,7 @@ function MobileMenuItem({ category, basePath, depth = 0 }: { category: Category,
         >
           {category.name}
         </Link>
-        {category.children?.length > 0 && (
+        {category.children && category.children.length > 0 && (
           <button 
             onClick={() => setIsOpen(!isOpen)}
             className="px-4 py-2 text-white text-xl font-bold"
@@ -75,9 +75,9 @@ function MobileMenuItem({ category, basePath, depth = 0 }: { category: Category,
         )}
       </div>
       
-      {category.children?.length > 0 && isOpen && (
+      {category.children && category.children.length > 0 && isOpen && (
         <ul className="bg-zinc-900/50">
-          {category.children.map(child => (
+          {category.children?.map(child => (
             <MobileMenuItem
               key={child.id}
               category={child}

@@ -1,22 +1,20 @@
-import { getContactInfo, getAllCategories, getStoreInfo } from "@/lib/queries"
+import { getContactInfo, getAllCategories, getStoreInfo, getPolicies } from "@/lib/queries"
 import ClientMainLayout from "./client-main-layout"
 
 export default async function MainLayout({ children }: { children: React.ReactNode }) {
-  const [contactInfo, categories, storeInfo] = await Promise.all([
+  const [contactInfo, categories, storeInfo, policies] = await Promise.all([
     getContactInfo(),
     getAllCategories(),
-    getStoreInfo()
+    getStoreInfo(),
+    getPolicies()
   ])
-
-  console.log('Contact Info:', contactInfo)
-  console.log('Categories:', categories)
-  console.log('Store Info:', storeInfo)
 
   return (
     <ClientMainLayout 
       contactInfo={contactInfo}
       categories={categories}
       storeInfo={storeInfo}
+      policies={policies}
     >
       {children}
     </ClientMainLayout>

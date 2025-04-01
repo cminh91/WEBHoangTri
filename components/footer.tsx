@@ -23,9 +23,16 @@ interface FooterProps {
     logo?: string
   } | null
   contactInfo?: ContactInfoType | null
+  policies?: Array<{
+    id: string
+    title: string
+    slug: string
+    excerpt?: string | null
+    order?: number
+  }> | null
 }
 
-export default function Footer({ storeInfo, contactInfo }: FooterProps) {
+export default function Footer({ storeInfo, contactInfo, policies }: FooterProps) {
   const displayData = {
     name: storeInfo?.name || "N/A",
     logoUrl: storeInfo?.logoUrl || storeInfo?.logo || "/logo.png",
@@ -120,10 +127,25 @@ export default function Footer({ storeInfo, contactInfo }: FooterProps) {
           <div>
             <h3 className="text-lg font-semibold mb-6 text-red-500">Chính Sách</h3>
             <ul className="space-y-3">
-              <li><Link href="/bao-hanh" className="text-gray-400 hover:text-white">Bảo hành</Link></li>
-              <li><Link href="/van-chuyen" className="text-gray-400 hover:text-white">Vận chuyển</Link></li>
-              <li><Link href="/doi-tra" className="text-gray-400 hover:text-white">Đổi trả</Link></li>
-              <li><Link href="/dieu-khoan" className="text-gray-400 hover:text-white">Điều khoản</Link></li>
+              {policies && policies.length > 0 ? (
+                policies.map(policy => (
+                  <li key={policy.id}>
+                    <Link 
+                      href={`/chinh-sach/${policy.slug}`} 
+                      className="text-gray-400 hover:text-white"
+                    >
+                      {policy.title}
+                    </Link>
+                  </li>
+                ))
+              ) : (
+                <>
+                  <li><Link href="/bao-hanh" className="text-gray-400 hover:text-white">Bảo hành</Link></li>
+                  <li><Link href="/van-chuyen" className="text-gray-400 hover:text-white">Vận chuyển</Link></li>
+                  <li><Link href="/doi-tra" className="text-gray-400 hover:text-white">Đổi trả</Link></li>
+                  <li><Link href="/dieu-khoan" className="text-gray-400 hover:text-white">Điều khoản</Link></li>
+                </>
+              )}
             </ul>
           </div>
         </div>
