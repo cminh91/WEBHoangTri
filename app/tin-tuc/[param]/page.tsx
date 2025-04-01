@@ -144,7 +144,7 @@ async function renderCategoryPage(category: any) {
         <p className="mb-12 text-center text-gray-400">Tin tức về {category.name} từ Hoàng Trí Moto</p>
 
         <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
-          {newsItems.map((item) => (
+          {newsItems.map((item: { id: string; images: { url: string }[]; title: string; slug: string; publishDate: Date; category: { name: string } | null; excerpt: string }) => (
             <Link
               href={`/tin-tuc/${item.slug}`}
               key={item.id}
@@ -281,7 +281,7 @@ async function renderNewsPage(news: any) {
           <div>
             <h2 className="mb-8 text-2xl font-bold">Tin Tức Liên Quan</h2>
             <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
-              {relatedNews.map((item) => (
+              {relatedNews.map((item: { id: string; images: { url: string }[]; title: string; slug: string; publishDate: Date; category: { name: string } | null }) => (
                 <Link
                   href={`/tin-tuc/${item.slug}`}
                   key={item.id}

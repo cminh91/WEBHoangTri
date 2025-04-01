@@ -39,26 +39,30 @@ export default async function ProductsPage({
   // Build where clause
   const where: any = { isActive: true }
   
-  if (searchParams.category) {
-    where.category = { slug: searchParams.category }
+  const category = await searchParams.category
+  const search = await searchParams.search
+  const sort = await searchParams.sort
+
+  if (category) {
+    where.category = { slug: category }
   }
 
-  if (searchParams.search) {
+  if (search) {
     where.name = {
-      contains: searchParams.search,
+      contains: search,
     }
   }
 
   // Build orderBy
   let orderBy: any = { createdAt: 'desc' }
-  if (searchParams.sort === 'price-asc') {
+  if (sort === 'price-asc') {
     orderBy = { price: 'asc' }
-  } else if (searchParams.sort === 'price-desc') {
+  } else if (sort === 'price-desc') {
     orderBy = { price: 'desc' }
   }
 
   // Lấy giá trị sort hiện tại và chuyển thành string
-  const currentSort = searchParams.sort ? String(searchParams.sort) : '';
+  const currentSort = sort ? String(sort) : '';
 
   // Get categories for filter
   const categories = await prisma.category.findMany({
@@ -115,7 +119,7 @@ export default async function ProductsPage({
         {/* Product Grid - Cải thiện spacing và animation */}
         {products.length > 0 ? (
           <div className="grid grid-cols-1 gap-4 sm:gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-            {products.map((product) => {
+            {products.map((product: Product) => {
               const processedProduct = {
                 ...product,
                 price: Number(product.price),

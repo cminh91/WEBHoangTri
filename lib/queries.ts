@@ -1,5 +1,64 @@
 import prisma from "./prisma"
-import { Product, Service, } from "../types"
+import {
+  Product,
+  Service,
+  Slider,
+  Category,
+  Testimonial,
+  Partner,
+  TeamMember,
+  ContactInfo,
+  StoreInfo,
+  NewsItem
+} from "../types"
+
+interface SliderResult {
+  id: string
+  title: string
+  url: string
+  link: string | null
+  isActive: boolean
+  order: number
+}
+
+interface CategoryResult {
+  id: string
+  name: string
+  slug: string
+  type: 'PRODUCT' | 'SERVICE' | 'NEWS'
+  parentId: string | null
+  description: string | null
+  imageUrl: string | null
+}
+
+interface FeaturedProduct extends Omit<Product, 'images'> {
+  images: Array<{url: string, alt?: string | null}>
+  category: {
+    name: string
+    slug: string
+  } | null
+}
+
+interface FeaturedService extends Service {
+  images: Array<{url: string, alt: string | null}>
+  category: {
+    id: string
+    name: string
+    slug: string
+  } | null
+}
+
+interface NewsResult extends Omit<NewsItem, 'images'> {
+  images: Array<{url: string, alt: string | null}>
+  categoryName: string | null
+}
+
+interface CategoryTree {
+  products: Category[]
+  services: Category[]
+  news: Category[]
+  all: Category[]
+}
 
 if (!prisma) {
   throw new Error("Prisma client không được khởi tạo")
@@ -89,7 +148,7 @@ export async function getFeaturedProducts() {
       }
     })
     
-    return products.map((product) => ({
+    return products.map((product: Product) => ({
       ...product,
       price: product.price ? Number(product.price) : 0,
       salePrice: product.salePrice ? Number(product.salePrice) : 0,
@@ -131,7 +190,7 @@ export async function getAllCategories() {
     const categoryMap = new Map<string, any>()
     const rootCategories: any[] = []
     
-    allCategories.forEach(category => {
+    allCategories.forEach((category: Category) => {
       const node = {
         ...category,
         children: []
@@ -197,11 +256,11 @@ export async function getFeaturedServices() {
       }
     })
 
-    return services.map((service): Service => ({
+    return services.map((service: Service) => ({
       ...service,
       title: service.title || '',
       price: service.price ? Number(service.price) : null,
-      images: service.images.map((img) => ({
+      images: service.images.map((img: { url: string, alt: string | null }) => ({
         url: img.url,
         alt: img.alt || null
       }))
@@ -239,9 +298,9 @@ export async function getLatestNews() {
       }
     })
     
-    return news.map((item) => ({
+    return news.map((item: NewsItem) => ({
       ...item,
-      images: item.images.map((img: { url: string }) => img.url),
+      images: item.images.map((img: { url: string, alt: string | null }) => img.url),
       categoryName: item.category?.name || null
     }))
   } catch (error) {
@@ -487,5 +546,26 @@ export async function getPolicies() {
   } catch (error) {
     console.error("Failed to fetch policies:", error);
     return [];
+  }
+}
+
+// Fetch analytics stats
+export async function getAnalyticsStats() {
+  try {
+    const response = await fetch('/api/analytics');
+    if (!response.ok) {
+      throw new Error('Failed to fetch analytics');
+    }
+    const data = await response.json();
+    return {
+      pageViews: data.summary?.pageViews || 0,
+      uniqueVisitors: data.summary?.uniqueVisitors || 0
+    };
+  } catch (error) {
+    console.error("Failed to fetch analytics stats:", error);
+    return {
+      pageViews: 0,
+      uniqueVisitors: 0
+    };
   }
 }

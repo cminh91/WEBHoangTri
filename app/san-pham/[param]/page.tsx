@@ -136,7 +136,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
   }
   
   // Convert Decimal to number for related products
-  const processedRelatedProducts = relatedProducts.map(product => ({
+  const processedRelatedProducts = relatedProducts.map((product: { price: number; salePrice: number | null }) => ({
     ...product,
     price: Number(product.price),
     salePrice: product.salePrice ? Number(product.salePrice) : null

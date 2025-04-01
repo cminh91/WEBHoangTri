@@ -61,7 +61,7 @@ export default async function Home() {
   ])
 
   // Format dữ liệu slider
-  const formattedSliders = sliders.map(slider => ({
+  const formattedSliders = sliders.map((slider: any) => ({
     ...slider,
     subtitle: null,
     buttonText: null,
@@ -72,7 +72,7 @@ export default async function Home() {
   }))
 
   // Format dữ liệu products
-  const formattedProducts = products.map(product => ({
+  const formattedProducts = products.map((product: any) => ({
     ...product,
     slug: product.name.toLowerCase().replace(/\s+/g, '-'),
     description: "Mô tả sản phẩm",
@@ -85,7 +85,7 @@ export default async function Home() {
   }))
 
   // Format dữ liệu team members
-  const formattedTeam = teamData.map(member => ({
+  const formattedTeam = teamData.map((member: { id: string; name: string; position: string; image?: string; bio?: string; order: number }) => ({
     id: member.id,
     name: member.name,
     position: member.position,
@@ -94,7 +94,7 @@ export default async function Home() {
     order: member.order
   }))
 // Format dữ liệu services
-const formattedServices = services.map(service => ({
+const formattedServices = services.map((service: { title?: string; description?: string; price?: number | string }) => ({
   ...service,
   slug: service.title?.toLowerCase().replace(/\s+/g, '-') || '',
   description: service.description || 'Mô tả dịch vụ',
@@ -102,7 +102,7 @@ const formattedServices = services.map(service => ({
 }))
 
   // Format dữ liệu partners
-  const formattedPartners = partners.map(partner => ({
+  const formattedPartners = partners.map((partner: { id: string; name: string; logo: string; website: string; order: number }) => ({
     id: partner.id,
     name: partner.name,
     logo: partner.logo,
@@ -112,7 +112,7 @@ const formattedServices = services.map(service => ({
 
 
   // Format dữ liệu news
-  const formattedNews = newsData.map(news => ({
+  const formattedNews = newsData.map((news: { title: string; content?: string }) => ({
     ...news,
     slug: news.title.toLowerCase().replace(/\s+/g, '-'),
     excerpt: news.content?.substring(0, 100) + '...' || 'Mô tả tin tức',

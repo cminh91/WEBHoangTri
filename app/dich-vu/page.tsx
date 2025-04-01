@@ -5,6 +5,19 @@ import Link from "next/link"
 import prisma from "@/lib/db"
 import { ServiceCategoryFilter } from "@/components/services/category-filter"
 
+interface Service {
+  id: string
+  title: string
+  slug: string
+  description: string
+  features: string
+  images: Array<{ url: string }>
+  category?: {
+    name: string
+    slug: string
+  } | null
+}
+
 interface PageProps {
   searchParams: {
     category?: string
@@ -52,7 +65,13 @@ export default async function ServicesPage({ searchParams }: PageProps) {
   })
   
   // Lấy dịch vụ với bộ lọc danh mục
-  const services = await getServices(searchParams.category)
+  const category = await searchParams.category
+  const services = await getServices(category)
+  
+  // Tìm category name nếu có
+  const categoryName = category
+    ? categories.find((c: {slug: string}) => c.slug === category)?.name
+    : undefined
   
   return (
     <div className="min-h-screen bg-black pt-24">
@@ -64,11 +83,11 @@ export default async function ServicesPage({ searchParams }: PageProps) {
           </Link>
           <ChevronRight className="mx-1 md:mx-2 h-3 w-3 md:h-4 md:w-4 flex-shrink-0" />
           <span className="text-white">Dịch Vụ</span>
-          {searchParams.category && categories.find(c => c.slug === searchParams.category) && (
+          {categoryName && (
             <>
               <ChevronRight className="mx-1 md:mx-2 h-3 w-3 md:h-4 md:w-4 flex-shrink-0" />
               <span className="text-white">
-                {categories.find(c => c.slug === searchParams.category)?.name}
+                {categoryName}
               </span>
             </>
           )}
@@ -85,7 +104,7 @@ export default async function ServicesPage({ searchParams }: PageProps) {
         {/* Phần còn lại của trang */}
         <div className="space-y-8 md:space-y-16">
           {services && services.length > 0 ? (
-            services.map((service, index) => (
+            services.map((service: Service, index: number) => (
               <div key={service.id} className="rounded-lg bg-zinc-900 overflow-hidden shadow-lg transform transition-transform hover:scale-[1.01] duration-300">
                 <div className="grid grid-cols-1 md:grid-cols-2">
                   {index % 2 === 0 ? (

@@ -40,7 +40,7 @@ export default async function PoliciesPage() {
       
       <div className="mt-8 grid gap-6">
         {policies.length > 0 ? (
-          policies.map((policy) => (
+          policies.map((policy: { id: string; title: string; slug: string; excerpt: string | null }) => (
             <div key={policy.id} className="border border-zinc-800 rounded-lg p-6 hover:border-red-600 transition-colors">
               <h2 className="text-xl font-bold mb-2">
                 <Link href={`/chinh-sach/${policy.slug}`} className="text-red-500 hover:text-red-400 no-underline">
