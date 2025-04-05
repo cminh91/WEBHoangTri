@@ -130,7 +130,7 @@ export default function NewsSection({ initialNews }: NewsSectionProps) {
           {/* News grid */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {news.map((item) => (
-              <Link key={item.id} href={`/tin-tuc/${item.slug}`}>
+              <Link key={item.id} href={`/tin-tuc?category=/${item.slug}`}>
                 <div className="group relative h-[250px] overflow-hidden rounded-lg">
                   <Image
                     src={getImageUrl(item.images)}

@@ -374,30 +374,24 @@ export default function ContactPage() {
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="mapUrl">URL Bản Đồ</Label>
-              <Input
+              <Label htmlFor="mapUrl">Mã Nhúng Bản Đồ</Label>
+              <Textarea
                 id="mapUrl"
                 name="mapUrl"
                 value={formData.mapUrl}
                 onChange={handleChange}
-                placeholder="https://www.google.com/maps/embed?..."
+                placeholder="<iframe src=... ></iframe>"
                 className="border-zinc-700 bg-zinc-800 focus:border-red-600"
               />
-              <p className="text-xs text-gray-400">Nhập URL nhúng từ Google Maps</p>
+              <p className="text-xs text-gray-400">Dán mã nhúng từ Google Maps</p>
             </div>
 
             {formData.mapUrl && (
-              <div className="h-[300px] w-full overflow-hidden rounded-lg border border-zinc-700">
-                <iframe
-                  src={formData.mapUrl}
-                  width="100%"
-                  height="100%"
-                  style={{ border: 0 }}
-                  allowFullScreen
-                  loading="lazy"
-                  referrerPolicy="no-referrer-when-downgrade"
-                  className="rounded-lg"
-                ></iframe>
+              <div className="w-full overflow-hidden rounded-lg border border-zinc-700">
+                <div 
+                  style={{ height: '300px', width: '100%' }}
+                  dangerouslySetInnerHTML={{ __html: formData.mapUrl }} 
+                />
               </div>
             )}
           </CardContent>

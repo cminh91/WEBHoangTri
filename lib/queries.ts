@@ -1,3 +1,5 @@
+"use server"
+
 import prisma from "./prisma"
 import {
   Product,
@@ -148,11 +150,12 @@ export async function getFeaturedProducts() {
       }
     })
     
-    return products.map((product: Product) => ({
+    return products.map((product) => ({
       ...product,
       price: product.price ? Number(product.price) : 0,
       salePrice: product.salePrice ? Number(product.salePrice) : 0,
-      images: product.images.map((img: { url: string }) => img.url)
+      images: product.images.map((img) => img.url),
+      specs: product.specs && typeof product.specs === 'object' ? product.specs : null
     }))
   } catch (error) {
     console.error("Failed to fetch featured products:", error)
@@ -230,43 +233,25 @@ export async function getAllCategories() {
 // Fetch featured services
 export async function getFeaturedServices() {
   try {
+    console.log("Fetching featured services...")
     const services = await prisma.service.findMany({
       where: {
         featured: true,
         isActive: true
       },
-      include: {
+      include: { // Thêm include để lấy images
         images: {
           select: {
             url: true,
             alt: true
           }
-        },
-        category: {
-          select: {
-            id: true,
-            name: true,
-            slug: true
-          }
         }
-      },
-      take: 3,
-      orderBy: {
-        createdAt: 'desc'
       }
     })
-
-    return services.map((service: Service) => ({
-      ...service,
-      title: service.title || '',
-      price: service.price ? Number(service.price) : null,
-      images: service.images.map((img: { url: string, alt: string | null }) => ({
-        url: img.url,
-        alt: img.alt || null
-      }))
-    }))
+    console.log("Featured services:", services)
+    return services
   } catch (error) {
-    console.error("Failed to fetch featured services:", error)
+    console.error('Error getting featured services:', error)
     return []
   }
 }

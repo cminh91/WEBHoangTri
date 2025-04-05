@@ -1,6 +1,10 @@
 export interface StoreInfo {
   name: string
-  logo: string | null
+  logo: {
+    url: string
+    width: number
+    height: number
+  } | null
   hotline: string
   address?: string
   phone?: string

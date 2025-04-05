@@ -84,7 +84,7 @@ export default function SpecialServices({ initialServices }: SpecialServicesProp
         <div className="space-y-10 text-white">
           {/* Danh sách dịch vụ */}
           {displayedServices.map((service, index) => (
-            <Link href={`/dich-vu/${service.slug}`} key={service.id} className="block group">
+            <Link href={`/dich-vu?category=${service.category?.slug || ''}`} key={service.id} className="block group">
               <div className="grid grid-cols-1 md:grid-cols-2 items-center gap-12">
                 <>
                   {/* Hình ảnh bên trái */}

@@ -213,16 +213,11 @@ export default async function ContactPage() {
 
         {/* Map - remove rounded-xl class */}
         <div className="mt-12 overflow-hidden border border-zinc-800/50">
-          <iframe
-            src={contactData?.mapUrl || "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15637.57385455332!2d108.03746282542055!3d12.666600291236432!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x31721d9e86a3325f%3A0x4a9a7d7fb2ed1d10!2zQnXDtG4gTWEgVGh14buZdCwgxJDhuq9rIEzhuq9rLCBWaeG7h3QgTmFt!5e0!3m2!1svi!2s!4v1652345678901!5m2!1svi!2s"}
-            width="100%"
-            height="450"
-            style={{ border: 0 }}
-            allowFullScreen
-            loading="lazy"
-            referrerPolicy="no-referrer-when-downgrade"
-            className="w-full"
-          />
+          {contactData?.mapUrl ? (
+            <div dangerouslySetInnerHTML={{ __html: contactData.mapUrl }} style={{width: '100%', height: '450px'}}/>
+          ) : (
+            <p className="p-4 text-gray-400">Không có mã nhúng bản đồ.</p>
+          )}
         </div>
       </div>
     </div>

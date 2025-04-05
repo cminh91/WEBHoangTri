@@ -1,9 +1,14 @@
 import { NextResponse } from "next/server"
 import { getServerSession } from "next-auth/next"
 import { authOptions } from "@/lib/auth"
-import { writeFile, mkdir } from "fs/promises"
-import { join } from "path"
-import { v4 as uuidv4 } from "uuid"
+import { v2 as cloudinary } from 'cloudinary'
+
+// Cấu hình cloudinary với env vars
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET
+});
 
 export async function POST(request: Request) {
   try {
@@ -22,37 +27,29 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "No file provided" }, { status: 400 })
     }
 
+    // Chuyển file thành base64
     const bytes = await file.arrayBuffer()
     const buffer = Buffer.from(bytes)
+    const base64File = `data:${file.type};base64,${buffer.toString('base64')}`
 
-    // Get file extension
-    const originalName = file.name
-    const extension = originalName.split(".").pop()?.toLowerCase() || ""
+    // Upload lên Cloudinary
+    const result = await cloudinary.uploader.upload(base64File, {
+      folder: 'hoang-tri-moto', // Tên folder trên Cloudinary
+      resource_type: 'auto'
+    })
 
-    // Validate file type
-    const allowedTypes = ["jpg", "jpeg", "png", "gif", "webp"]
-    if (!allowedTypes.includes(extension)) {
-      return NextResponse.json({ error: `File type .${extension} is not supported` }, { status: 400 })
-    }
+    // Trả về secure URL của ảnh
+    return NextResponse.json({ 
+      url: result.secure_url,
+      public_id: result.public_id 
+    })
 
-    // Generate unique filename
-    const fileName = `${uuidv4()}.${extension}`
-
-    // Create uploads directory if it doesn't exist
-    const uploadsDir = join(process.cwd(), "public", "uploads")
-    await mkdir(uploadsDir, { recursive: true })
-
-    // Save file to public/uploads directory
-    const filePath = join(uploadsDir, fileName)
-    await writeFile(filePath, buffer)
-
-    // Generate URL for the uploaded file
-    const url = `/uploads/${fileName}`
-
-    return NextResponse.json({ url })
   } catch (error: any) {
-    console.error("Detailed upload error:", error)
-    return NextResponse.json({ error: "Error uploading files", details: error?.message || "Unknown error" }, { status: 500 })
+    console.error("Upload error:", error)
+    return NextResponse.json(
+      { error: "Error uploading file", details: error?.message }, 
+      { status: 500 }
+    )
   }
 }
 

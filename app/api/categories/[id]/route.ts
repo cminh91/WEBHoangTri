@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth/next"
 import { authOptions } from "@/lib/auth"
 import prisma from "@/lib/db"
 import { z } from "zod"
+import { revalidatePath } from 'next/cache'
 
 // Schema for category validation
 const categorySchema = z.object({
@@ -47,6 +48,7 @@ export async function PUT(request: Request, { params }: { params: { id: string }
   }
 
   try {
+    const { id } = params; // Get id from params
     const json = await request.json()
     const data = categorySchema.parse(json)
 
@@ -55,7 +57,7 @@ export async function PUT(request: Request, { params }: { params: { id: string }
       where: {
         slug: data.slug,
         id: {
-          not: params.id,
+          not: id, // Use id here
         },
       },
     })
@@ -65,16 +67,19 @@ export async function PUT(request: Request, { params }: { params: { id: string }
     }
 
     // Prevent category from being its own parent
-    if (data.parentId === params.id) {
+    if (data.parentId === id) { // Use id here
       return NextResponse.json({ error: "Category cannot be its own parent" }, { status: 400 })
     }
 
     const category = await prisma.category.update({
       where: {
-        id: params.id,
+        id: id, // Use id here
       },
       data,
     })
+
+    // Revalidate cache after update
+    revalidatePath('/', 'layout')
 
     return NextResponse.json(category)
   } catch (error) {

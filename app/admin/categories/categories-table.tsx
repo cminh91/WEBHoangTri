@@ -257,41 +257,28 @@ export function CategoriesTable() {
                       "—"
                     )}
                   </TableCell>
-                  <TableCell className="text-right">
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" className="h-8 w-8 p-0">
-                          <span className="sr-only">Mở menu</span>
-                          <MoreHorizontal className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuLabel>Thao tác</DropdownMenuLabel>
-                        <DropdownMenuSeparator />
-                        <CategoryDialog category={category}>
-                          <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
-                            <Edit className="mr-2 h-4 w-4" />
-                            Sửa
-                          </DropdownMenuItem>
-                        </CategoryDialog>
-                        <CategoryDialog parentCategory={category} defaultType={category.type}>
-                          <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
-                            <Plus className="mr-2 h-4 w-4" />
-                            Thêm danh mục con
-                          </DropdownMenuItem>
-                        </CategoryDialog>
-                        <DropdownMenuItem
-                          onSelect={(e) => {
-                            e.preventDefault()
-                            setDeleteCategoryId(category.id)
-                          }}
-                          className="text-red-600"
-                        >
-                          <Trash2 className="mr-2 h-4 w-4" />
-                          Xóa
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
+                  <TableCell className="text-right space-x-2">
+                    <CategoryDialog category={category}>
+                      <Button variant="ghost" size="sm">
+                        <Edit className="h-4 w-4" />
+                        Sửa
+                      </Button>
+                    </CategoryDialog>
+                    <CategoryDialog parentCategory={category} defaultType={category.type}>
+                      <Button variant="ghost" size="sm">
+                        <Plus className="mr-2 h-4 w-4" />
+                        Thêm
+                      </Button>
+                    </CategoryDialog>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setDeleteCategoryId(category.id)}
+                      className="text-red-600"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                      Xóa
+                    </Button>
                   </TableCell>
                 </TableRow>
               ))

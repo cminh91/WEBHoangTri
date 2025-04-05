@@ -73,7 +73,7 @@ export default function ClientMainLayout({
         />
       )}
       {children}
-      {!isAdminPage && <Footer contactInfo={contactInfo ?? undefined} storeInfo={storeInfo} policies={policies} />}
+      {!isAdminPage && <Footer contactInfo={contactInfo} storeInfo={storeInfo} policies={policies} />}
     </CartProvider>
   )
 }

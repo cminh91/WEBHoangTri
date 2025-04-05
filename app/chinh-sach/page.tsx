@@ -7,10 +7,10 @@ async function getAllPolicies() {
       where: {
         isPublished: true
       },
-      orderBy: {
-        order: 'asc',
-        title: 'asc' // Sắp xếp phụ theo tên nếu order giống nhau
-      },
+      orderBy: [
+        { order: 'asc' },
+        { title: 'asc' } // Sắp xếp phụ theo tên nếu order giống nhau
+      ],
       select: {
         id: true,
         title: true,

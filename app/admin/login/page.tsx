@@ -30,17 +30,22 @@ export default function AdminLogin() {
         redirect: false,
         name,
         password,
-        callbackUrl,
       })
 
-      if (result?.error) {
+      if (!result?.ok) {
         setError("Tên đăng nhập hoặc mật khẩu không chính xác.")
-      } else if (result?.url) {
-        router.push(result.url)
-        router.refresh()
+        return
       }
-    } catch (error: any) {
-      console.error("Error signing in: ", error)
+
+      // Chuyển hướng sau khi đăng nhập thành công
+      if (callbackUrl) {
+        router.replace(callbackUrl)
+      } else {
+        router.replace("/admin")
+      }
+      
+    } catch (error) {
+      console.error("Login error:", error)
       setError("Đã xảy ra lỗi khi đăng nhập. Vui lòng thử lại.")
     } finally {
       setLoading(false)
