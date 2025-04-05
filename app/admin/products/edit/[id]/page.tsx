@@ -24,7 +24,8 @@ type Category = {
 
 export default function EditProductPage() {
   const router = useRouter()
-  const { id } = useParams() // Lấy product ID từ URL
+  const params = useParams(); // Lấy product ID từ URL
+  const id = params?.id as string | undefined;
   const [loading, setLoading] = useState(false)
   const [categories, setCategories] = useState<Category[]>([])
 

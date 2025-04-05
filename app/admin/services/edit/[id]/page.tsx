@@ -17,7 +17,7 @@ import { Checkbox } from "@/components/ui/checkbox"
 
 export default function EditServicePage() {
   const router = useRouter()
-  const { id } = useParams()
+  const { id } = useParams() as { id: string }
   const [loading, setLoading] = useState(false)
   const [imageFile, setImageFile] = useState<File | null>(null)
   const [categories, setCategories] = useState<Array<{ id: string; name: string }>>([])

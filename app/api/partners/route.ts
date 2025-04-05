@@ -20,13 +20,17 @@ export async function POST(request: Request) {
     }
 
     const json = await request.json()
-    const data = partnerSchema.parse(json)
+    console.log("Received data:", json); // Log dữ liệu nhận được
+    const data = partnerSchema.parse({
+      ...json,
+      url: json.url === "" ? null : json.url, // Chuyển chuỗi rỗng thành null
+    })
 
     const partner = await prisma.partner.create({
       data: {
         name: data.name,
         logo: data.logo,
-        website: data.url || null,
+        website: data.url,
         order: data.order,
         isActive: data.isActive
       }

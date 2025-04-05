@@ -27,7 +27,8 @@ interface Policy {
 
 export default function EditPolicyPage() {
   const router = useRouter()
-  const { id } = useParams() // Lấy id từ URL
+  const params = useParams() // Lấy id từ URL
+  const id = params?.id as string | undefined
   const [loading, setLoading] = useState(false)
   const [initialLoading, setInitialLoading] = useState(true)
   const [formData, setFormData] = useState({

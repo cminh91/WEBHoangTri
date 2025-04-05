@@ -28,10 +28,10 @@ export default function AdminEditor({ value, onChange, height = 500, placeholder
 
   return (
     <Editor
-      apiKey={process.env.NEXT_PUBLIC_TINYMCE_API_KEY}
-      onInit={(evt, editor) => (editorRef.current = editor)}
+      apiKey={process.env.NEXT_PUBLIC_TINYMCE_API_KEY as string}
+      onInit={(evt: unknown, editor: any) => (editorRef.current = editor)}
       value={value}
-      onEditorChange={(newValue) => onChange(newValue)}
+      onEditorChange={(newValue: string) => onChange(newValue)}
       init={{
         height,
         menubar: true,
@@ -67,7 +67,7 @@ export default function AdminEditor({ value, onChange, height = 500, placeholder
         branding: false,
         promotion: false,
         resize: false,
-      }}
+      } as Record<string, any>}
       // className="border border-zinc-700 rounded-md"
     />
   )

@@ -27,9 +27,9 @@ import { ImageUpload } from "@/components/admin/image-upload"
 // Form schema
 const formSchema = z.object({
   name: z.string().min(2, "Tên phải có ít nhất 2 ký tự"),
-  logo: z.string(), // Changed from .url() to just string
-  url: z.string().url("URL phải hợp lệ").optional().or(z.literal("")),
-  order: z.coerce.number().int().default(0),
+  logo: z.string().min(1, "Vui lòng tải lên logo"),
+  url: z.string().url("URL phải hợp lệ").optional().or(z.literal("")), // Cho phép URL hợp lệ hoặc chuỗi rỗng
+  order: z.coerce.number().int().min(0, "Thứ tự phải là số không âm"),
   isActive: z.boolean().default(true),
 })
 

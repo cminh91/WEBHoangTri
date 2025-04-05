@@ -10,13 +10,43 @@ import {
   clearCart, 
   updateCartTotal 
 } from "@/lib/cart"
-import { CartItem, Product, Image, Category } from "@prisma/client"
+// Define the Image type manually if it is not exported by @prisma/client
+interface Image {
+  id: string;
+  url: string;
+  productId: string;
+}
+
+// Define the Product type manually if it is not exported by @prisma/client
+interface Product {
+  id: string;
+  name: string;
+  slug: string;
+  price: number;
+  salePrice?: number | null;
+  inStock: boolean;
+}
+
+// Define the CartItem type manually if it is not exported by @prisma/client
+interface CartItem {
+  id: string;
+  cartId: string;
+  productId: string;
+  quantity: number;
+  price: number;
+  createdAt: Date;
+  updatedAt: Date;
+}
 
 // Define the types for better type checking
 interface CartItemWithProduct extends CartItem {
   product: Product & {
     images: Image[];
-    category: Category;
+    category: {
+      id: string;
+      name: string;
+      slug: string;
+    };
   }
 }
 

@@ -22,7 +22,7 @@ const Editor = dynamic(() => import("@/components/admin/admin-editor"), {
 
 export default function EditNewsPage() {
   const router = useRouter()
-  const { id } = useParams() // Get the news ID from the URL
+  const { id } = useParams() as { id: string } // Get the news ID from the URL
   const [loading, setLoading] = useState(false)
   const [imageFile, setImageFile] = useState<File | null>(null)
   const [imagePreview, setImagePreview] = useState<string | null>(null)

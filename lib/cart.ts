@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from "uuid"
 import prisma from "@/lib/prisma"
-import { Prisma } from "@prisma/client"
+import * as Prisma from "@prisma/client"
 
 // Interface cho cart item
 interface CartItemParams {
@@ -17,12 +17,12 @@ interface CartItemWithProduct {
   cartId: string
   productId: string
   quantity: number
-  price: Prisma.Decimal | number
+  price: number
   product: {
     name: string
     slug: string
-    price: Prisma.Decimal | number
-    salePrice: Prisma.Decimal | number | null
+    price: number
+    salePrice: number | null
   }
 }
 
@@ -221,8 +221,8 @@ export async function updateCartTotal(cartId: string) {
   });
 
   let total = 0;
-  cartItems.forEach((item) => {
-    const price = item.product.salePrice || item.product.price;
+  cartItems.forEach((item: { quantity: number; product: { price: number; salePrice: number | null } }) => {
+    const price: number = item.product.salePrice || item.product.price;
     total += Number(price) * item.quantity;
   });
 
