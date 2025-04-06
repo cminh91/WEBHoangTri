@@ -361,7 +361,7 @@ export default function TeamPage() {
 
       {/* Add/Edit Team Member Dialog */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="border-zinc-800 bg-zinc-950 text-white sm:max-w-[600px]">
+        <DialogContent className="border-zinc-800 bg-zinc-950 text-white sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>{selectedMember ? "Chỉnh Sửa Thành Viên" : "Thêm Thành Viên Mới"}</DialogTitle>
             <DialogDescription className="text-gray-400">

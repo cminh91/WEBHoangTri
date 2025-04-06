@@ -63,7 +63,6 @@ export default async function Home() {
   // Format dữ liệu slider
   const formattedSliders = sliders.map((slider: any) => ({
     ...slider,
-    subtitle: null,
     buttonText: null,
     mobileUrl: null,
     description: null,
@@ -127,7 +126,9 @@ const formattedServices = services.map((service: { title?: string; description?:
       <SliderDisplay sliders={formattedSliders} />
       <WhyChooseUs />
       <SpecialServices initialServices={formattedServices} />
-      <YouTubeSection videoId={storeInfo.youtubeVideoId} />
+      {storeInfo && storeInfo.youtubeVideoId && (
+        <YouTubeSection videoId={storeInfo.youtubeVideoId} />
+      )}
       <CategoryGrid categories={categories} />
       <FeaturedProducts 
         initialProducts={formattedProducts} 

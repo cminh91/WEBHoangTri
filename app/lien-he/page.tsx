@@ -29,27 +29,21 @@ export default async function ContactPage() {
     }
   })
 
-  const defaultWorkingHours: WorkingHours = {
-    monday: "8:00 - 18:00",
-    tuesday: "8:00 - 18:00",
-    wednesday: "8:00 - 18:00",
-    thursday: "8:00 - 18:00",
-    friday: "8:00 - 18:00",
-    saturday: "8:00 - 17:00",
-    sunday: "9:00 - 15:00"
-  }
+  // Lấy workingHours từ contactData, đảm bảo kiểu dữ liệu là WorkingHours hoặc null
+  const workingHours = contactData?.workingHours
+    ? (contactData.workingHours as WorkingHours)
+    : null;
 
-  const workingHours = contactData?.workingHours 
-    ? {
-        monday: String((contactData.workingHours as any).monday),
-        tuesday: String((contactData.workingHours as any).tuesday),
-        wednesday: String((contactData.workingHours as any).wednesday),
-        thursday: String((contactData.workingHours as any).thursday),
-        friday: String((contactData.workingHours as any).friday),
-        saturday: String((contactData.workingHours as any).saturday),
-        sunday: String((contactData.workingHours as any).sunday)
-      } as WorkingHours 
-    : defaultWorkingHours
+  // Map để dịch tên ngày sang tiếng Việt
+  const vietnameseDayMap: { [key in keyof WorkingHours]: string } = {
+    monday: "Thứ 2",
+    tuesday: "Thứ 3",
+    wednesday: "Thứ 4",
+    thursday: "Thứ 5",
+    friday: "Thứ 6",
+    saturday: "Thứ 7",
+    sunday: "Chủ Nhật"
+  };
 
   return (
     <div className="min-h-screen bg-black pt-24">
@@ -81,7 +75,7 @@ export default async function ContactPage() {
                 <MapPin className="h-6 w-6" />
               </div>
               <h3 className="mb-3 text-xl font-bold">Địa Chỉ</h3>
-              <p className="text-gray-400 leading-relaxed">{contactData?.address}</p>
+              <p className="text-gray-400 leading-relaxed">{contactData?.address || "Địa chỉ chưa cập nhật"}</p>
             </div>
 
             <div className="bg-zinc-900/50 p-6 backdrop-blur-sm border border-zinc-800/50 hover:border-red-600/30 transition-colors">
@@ -91,7 +85,7 @@ export default async function ContactPage() {
               <h3 className="mb-3 text-xl font-bold">Liên Hệ</h3>
               <div className="space-y-2">
                 <p className="text-gray-400">
-                  Điện thoại: <span className="text-white">{contactData?.phone}</span>
+                  Điện thoại: <span className="text-white">{contactData?.phone || "Chưa cập nhật"}</span>
                 </p>
                 {contactData?.hotline && (
                   <p className="text-gray-400">
@@ -116,19 +110,23 @@ export default async function ContactPage() {
                 <Mail className="h-6 w-6" />
               </div>
               <h3 className="mb-3 text-xl font-bold">Email</h3>
-              <p className="text-gray-400 leading-relaxed">{contactData?.email}</p>
+              <p className="text-gray-400 leading-relaxed">{contactData?.email || "Email chưa cập nhật"}</p>
             </div>
 
             <div className="rounded-xl bg-zinc-900/50 p-6 backdrop-blur-sm border border-zinc-800/50 hover:border-red-600/30 transition-colors">
               <h3 className="mb-4 text-xl font-bold">Giờ Làm Việc</h3>
-              <ul className="space-y-3 text-gray-400">
-                {Object.entries(workingHours).map(([day, time]) => (
-                  <li key={day} className="flex justify-between items-center py-1 border-b border-zinc-800/50 last:border-0">
-                    <span className="capitalize">{day}:</span>
-                    <span className="font-medium text-white">{time}</span>
-                  </li>
-                ))}
-              </ul>
+              {workingHours ? (
+                <ul className="space-y-3 text-gray-400">
+                  {Object.entries(workingHours).map(([day, time]) => (
+                    <li key={day} className="flex justify-between items-center py-1 border-b border-zinc-800/50 last:border-0">
+                      <span>{vietnameseDayMap[day as keyof WorkingHours]}:</span>
+                      <span className="font-medium text-white">{time || "N/A"}</span>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="text-gray-500">Giờ làm việc chưa được cập nhật.</p>
+              )}
             </div>
           </div>
 
@@ -208,17 +206,18 @@ export default async function ContactPage() {
                 Gửi Tin Nhắn
               </Button>
             </form>
+
+            {/* Map */}
+            <div className="mt-8 overflow-hidden border border-zinc-800/50">
+              {contactData?.mapUrl ? (
+                <div dangerouslySetInnerHTML={{ __html: contactData.mapUrl }} style={{width: '100%', height: '450px'}}/>
+              ) : (
+                <p className="p-4 text-center text-gray-500">Bản đồ chưa được cập nhật.</p>
+              )}
+            </div>
           </div>
         </div>
 
-        {/* Map - remove rounded-xl class */}
-        <div className="mt-12 overflow-hidden border border-zinc-800/50">
-          {contactData?.mapUrl ? (
-            <div dangerouslySetInnerHTML={{ __html: contactData.mapUrl }} style={{width: '100%', height: '450px'}}/>
-          ) : (
-            <p className="p-4 text-gray-400">Không có mã nhúng bản đồ.</p>
-          )}
-        </div>
       </div>
     </div>
   )

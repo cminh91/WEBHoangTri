@@ -1,6 +1,4 @@
 import { NextResponse } from "next/server"
-import { getServerSession } from "next-auth/next"
-import { authOptions } from "@/lib/auth"
 import prisma from "@/lib/db"
 import { z } from "zod"
 
@@ -39,95 +37,50 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
-  const session = await getServerSession(authOptions)
-
-  if (!session || session.user.role !== "ADMIN") {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
-  }
-
   try {
     const json = await request.json()
     const data = aboutSchema.parse(json)
-
-    // Extract images from data
     const { images, ...aboutData } = data
-
-    // Check if about record already exists
     const existingAbout = await prisma.about.findFirst()
-
     let about
 
     if (existingAbout) {
-      // Update existing about record
       about = await prisma.$transaction(async (tx) => {
-        // Get existing images
         const existingImages = await tx.image.findMany({
-          where: {
-            aboutId: existingAbout.id,
-          },
+          where: { aboutId: existingAbout.id }
         })
 
-        // Delete images that are not in the updated list
         if (images) {
-          const updatedImageIds = images.filter((img) => img.id).map((img) => img.id as string)
-
-          const imagesToDelete = existingImages.filter((img) => !updatedImageIds.includes(img.id))
-
+          const updatedImageIds = images.filter(img => img.id).map(img => img.id as string)
+          const imagesToDelete = existingImages.filter(img => !updatedImageIds.includes(img.id))
+          
           for (const image of imagesToDelete) {
-            await tx.image.delete({
-              where: {
-                id: image.id,
-              },
-            })
+            await tx.image.delete({ where: { id: image.id } })
           }
         }
 
-        // Update about
-        const updatedAbout = await tx.about.update({
-          where: {
-            id: existingAbout.id,
-          },
+        return await tx.about.update({
+          where: { id: existingAbout.id },
           data: {
             ...aboutData,
-            images: images
-              ? {
-                  upsert: images.map((image) => ({
-                    where: {
-                      id: image.id || "new-id", // If no ID, create new image
-                    },
-                    update: {
-                      url: image.url,
-                      alt: image.alt,
-                    },
-                    create: {
-                      url: image.url,
-                      alt: image.alt,
-                    },
-                  })),
-                }
-              : undefined,
+            images: images ? {
+              upsert: images.map(image => ({
+                where: { id: image.id || "new-id" },
+                update: { url: image.url, alt: image.alt },
+                create: { url: image.url, alt: image.alt }
+              }))
+            } : undefined
           },
-          include: {
-            images: true,
-          },
+          include: { images: true }
         })
-
-        return updatedAbout
       })
     } else {
-      // Create new about record
       about = await prisma.about.create({
         data: {
           ...aboutData,
-          images: images
-            ? {
-                create: images,
-              }
-            : undefined,
+          images: images ? { create: images } : undefined
         },
-        include: {
-          images: true,
-        },
+        include: { images: true }
       })
     }
 
@@ -136,7 +89,6 @@ export async function POST(request: Request) {
     if (error instanceof z.ZodError) {
       return NextResponse.json({ error: error.errors }, { status: 400 })
     }
-
     console.error("Error updating about:", error)
     return NextResponse.json({ error: "Error updating about" }, { status: 500 })
   }

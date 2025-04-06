@@ -39,7 +39,7 @@ export default function CategoryGrid({ categories }: CategoryGridProps) {
               {/* Background Image */}
               <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity">
                 <Image
-                  src="https://images.unsplash.com/photo-1591637333184-19aa84b3e01f?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NHx8bW90b3JjeWNsZXxlbnwwfHwwfHx8MA%3D%3D"
+                  src="https://i.imgur.com/UceQG3f.jpeg"
                   alt="Background Image"
                   layout="fill"
                   className="object-cover"

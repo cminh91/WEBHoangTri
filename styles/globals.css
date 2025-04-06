@@ -92,3 +92,24 @@ body {
     @apply bg-background text-foreground;
   }
 }
+
+@media (forced-colors: active) {
+  /* Các styles cho forced colors mode */
+  .forced-colors-mode {
+    forced-color-adjust: auto;
+  }
+}
+
+/* Thay thế các -ms-high-contrast cũ */
+@media (forced-colors: active) {
+  :root {
+    --foreground: CanvasText;
+    --background: Canvas;
+  }
+  
+  /* Đảm bảo các biểu tượng và border vẫn hiển thị */
+  .icon, 
+  .border {
+    forced-color-adjust: none;
+  }
+}

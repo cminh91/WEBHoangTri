@@ -75,20 +75,21 @@ export function SliderDisplay({ sliders }: SliderDisplayProps) {
                   {slider.title}
                 </h2>
                 {slider.subtitle && (
-                  <p className="text-base sm:text-lg md:text-xl text-white/90 drop-shadow-md leading-relaxed line-clamp-3 sm:line-clamp-none">
+                  <p className="text-sm sm:text-base md:text-lg lg:text-xl text-white/90 drop-shadow-md leading-relaxed">
                     {slider.subtitle}
                   </p>
                 )}
                 {slider.link && (
-                  <Link href={slider.link}>
-                    <Button 
-                      size="default"
-                      className="bg-red-600 hover:bg-red-700 text-sm sm:text-base md:text-lg 
-                               px-4 sm:px-6 md:px-8 py-2 sm:py-4 md:py-6"
-                    >
+                  <Button 
+                    size="default"
+                    className="bg-red-600 hover:bg-red-700 text-sm sm:text-base md:text-lg 
+                             px-4 sm:px-6 md:px-8 py-2 sm:py-4 md:py-6 mt-10"
+                    asChild
+                  >
+                    <Link href={slider.link}>
                       {slider.buttonText || "Xem thêm"}
-                    </Button>
-                  </Link>
+                    </Link>
+                  </Button>
                 )}
               </div>
             </div>

@@ -56,11 +56,11 @@ export default function AdminEditor({ value, onChange, height = 500, placeholder
           "wordcount",
         ],
         toolbar:
-          "undo redo | blocks | " +
+          "undo redo | blocks | fontselect fontsizeselect | " + // Added fontselect and fontsizeselect
           "bold italic forecolor | alignleft aligncenter " +
           "alignright alignjustify | bullist numlist outdent indent | " +
           "removeformat | help",
-        content_style: "body { font-family:Helvetica,Arial,sans-serif; font-size:14px }",
+        content_style: "body { font-family:Helvetica,Arial,sans-serif; font-size:14px; }", // Keep base style, TinyMCE handles selection
         placeholder: placeholder,
         skin: "oxide-dark",
         content_css: "dark",
