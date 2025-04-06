@@ -120,7 +120,7 @@ export default function FeaturedProducts({ initialProducts, categories = [] }: F
     return (
       <section className="bg-black py-16">
         <div className="container mx-auto px-4">
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
             {[...Array(4)].map((_, i) => (
               <div key={i} className="bg-zinc-900 animate-pulse h-64 rounded-lg"></div>
             ))}
@@ -133,7 +133,7 @@ export default function FeaturedProducts({ initialProducts, categories = [] }: F
   return (
     <section className="bg-black py-16">
       <div className="container mx-auto px-4">
-        <h2 className="text-2xl md:text-3xl font-bold text-white text-center mb-8">SẢN PHẨM NỔI BẬT</h2>
+        <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-white text-center mb-6 sm:mb-8">SẢN PHẨM NỔI BẬT</h2>
         
         <div className="mb-8 overflow-x-auto">
           <div className="flex min-w-max">
@@ -141,7 +141,7 @@ export default function FeaturedProducts({ initialProducts, categories = [] }: F
               <button
                 key={category.id}
                 onClick={() => handleCategoryChange(category.slug)}
-                className={`px-6 py-3 text-sm font-medium transition-colors ${
+                className={`px-4 sm:px-6 py-2 sm:py-3 text-xs sm:text-sm font-medium transition-colors ${
                   activeCategory === category.slug ? 'bg-red-600 text-white' : 'bg-zinc-800 text-white hover:bg-red-600'
                 } ${index === 0 ? 'rounded-l-md' : ''} ${
                   index === allCategories.length - 1 ? 'rounded-r-md' : ''
@@ -150,7 +150,7 @@ export default function FeaturedProducts({ initialProducts, categories = [] }: F
                 {category.name}
               </button>
             ))}
-            <Link href="/san-pham" className="px-6 py-3 text-sm font-medium bg-zinc-800 text-white hover:bg-red-600 transition-colors rounded-r-md">
+            <Link href="/san-pham" className="px-4 sm:px-6 py-2 sm:py-3 text-xs sm:text-sm font-medium bg-zinc-800 text-white hover:bg-red-600 transition-colors rounded-r-md">
               Xem tất cả
             </Link>
           </div>
@@ -161,7 +161,7 @@ export default function FeaturedProducts({ initialProducts, categories = [] }: F
             paginatedProducts.map((product) => (
               <div key={product.id} className="group relative overflow-hidden bg-zinc-900 rounded-lg">
                 <Link href={`/san-pham/${product.slug}`}>
-                  <div className="relative h-48 w-full overflow-hidden">
+                  <div className="relative h-40 sm:h-48 w-full overflow-hidden">
                     <Image 
                       src={getValidImageUrl(product.images)}
                       alt={product.name}

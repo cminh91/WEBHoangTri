@@ -14,12 +14,14 @@ export default function YouTubeSection({ videoId = "" }: YouTubeSectionProps) {
   useEffect(() => {
     console.log("[YouTubeSection] Received videoId:", videoId)
     console.log("[YouTubeSection] videoId type:", typeof videoId)
-    console.log("[YouTubeSection] videoId length:", videoId.length)
     
     // Kiểm tra giá trị
     if (!videoId) {
       console.log("[YouTubeSection] No videoId provided")
+      return
     }
+    
+    console.log("[YouTubeSection] videoId length:", videoId.length)
   }, [videoId])
 
   const handlePlay = () => {

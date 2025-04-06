@@ -1,5 +1,6 @@
-import Image from "next/image"
-import { Button } from "@/components/ui/button"
+import Image from "next/image";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
 import prisma from "@/lib/db"
 
 export default async function WhyChooseUs() {
@@ -14,37 +15,25 @@ export default async function WhyChooseUs() {
     }
   })
 
-  const benefits = [
-    "Đội ngũ kỹ thuật viên được đào tạo chuyên nghiệp",
-    "Trang thiết bị và công cụ hiện đại", 
-    "Phụ tùng chính hãng 100%",
-    "Bảo hành dài hạn cho mọi dịch vụ"
-  ]
-
   return (
     <section className="bg-black py-16">
       <div className="container mx-auto px-4">
         <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
           <div>
-            {/* Remove uppercase and font-bold from title to preserve Word formatting */}
             <h2 className="mb-6 text-4xl">
               {aboutData?.title || "Tại sao lại chọn chúng tôi"}
             </h2>
-            {/* Remove text-gray-400 to preserve Word text color */}
             <div 
               className="mb-8"
               dangerouslySetInnerHTML={{
                 __html: aboutData?.content || ""
               }}
             />
-            <ul className="mb-8 space-y-6">
-              {benefits.map((benefit, index) => (
-                <li key={index} className="text-xl font-semibold">
-                  {benefit}
-                </li>
-              ))}
-            </ul>
-            <Button className="bg-red-600 px-8 py-6 text-lg font-semibold text-white hover:bg-red-700">XEM THÊM</Button>
+            <Link href="/ve-chung-toi" passHref legacyBehavior>
+              <Button asChild className="bg-red-600 px-8 py-6 text-lg font-semibold text-white hover:bg-red-700">
+                <a>XEM THÊM</a>
+              </Button>
+            </Link>
           </div>
           <div className="relative">
             <div className="absolute -right-4 -top-4 h-full w-full border-t-4 border-r-4 border-red-600"></div>

@@ -33,17 +33,54 @@ interface FooterProps {
 }
 
 export default function Footer({ storeInfo, contactInfo, policies }: FooterProps) {
+
+  // Hàm helper để dịch ngày sang tiếng Việt
+  const formatWorkingHoursVietnamese = (hoursString: string | null | undefined): string => {
+    if (!hoursString) return "Thông tin giờ làm việc chưa cập nhật";
+
+    const dayMap: { [key: string]: string } = {
+      "Mon": "Thứ 2",
+      "Tue": "Thứ 3",
+      "Wed": "Thứ 4",
+      "Thu": "Thứ 5",
+      "Fri": "Thứ 6",
+      "Sat": "Thứ 7",
+      "Sun": "Chủ Nhật",
+      "Monday": "Thứ 2",
+      "Tuesday": "Thứ 3",
+      "Wednesday": "Thứ 4",
+      "Thursday": "Thứ 5",
+      "Friday": "Thứ 6",
+      "Saturday": "Thứ 7",
+      "Sunday": "Chủ Nhật"
+    };
+
+    let formattedString = hoursString;
+    // Thay thế các từ viết tắt hoặc tên đầy đủ
+    Object.keys(dayMap).forEach(key => {
+      // Sử dụng regex để đảm bảo chỉ thay thế từ đứng riêng lẻ (word boundary \b)
+      // và không phân biệt chữ hoa/thường (i)
+      const regex = new RegExp(`\\b${key}\\b`, 'gi');
+      formattedString = formattedString.replace(regex, dayMap[key]);
+    });
+
+    // Có thể thêm các thay thế khác nếu cần (ví dụ: AM/PM)
+    // formattedString = formattedString.replace(/AM/gi, 'Sáng');
+    // formattedString = formattedString.replace(/PM/gi, 'Chiều');
+
+    return formattedString;
+  };
   const displayData = {
-    name: storeInfo?.name || "N/A",
-    logoUrl: storeInfo?.logoUrl || storeInfo?.logo || "/logo.png",
-    footer: storeInfo?.footer || "Moto Edit là nhà phân phối các thiết bị và phụ kiện xe máy chính hãng",
-    address: contactInfo?.address || "N/A",
-    phone: contactInfo?.phone || "N/A",
-    email: contactInfo?.email || "N/A",
-    workingHoursFormatted: contactInfo?.workingHoursFormatted || "N/A",
-    facebookUrl: contactInfo?.facebookUrl || "#",
-    instagramUrl: contactInfo?.instagramUrl || "#",
-    youtubeUrl: contactInfo?.youtubeUrl || "#",
+    name: storeInfo?.name || "",
+    logoUrl: storeInfo?.logoUrl || storeInfo?.logo || "",
+    footer: storeInfo?.footer || "",
+    address: contactInfo?.address || "",
+    phone: contactInfo?.phone || "",
+    email: contactInfo?.email || "",
+    workingHoursFormatted: contactInfo?.workingHoursFormatted || "",
+    facebookUrl: contactInfo?.facebookUrl || "",
+    instagramUrl: contactInfo?.instagramUrl || "",
+    youtubeUrl: contactInfo?.youtubeUrl || "",
   }
 
   return (
@@ -54,31 +91,39 @@ export default function Footer({ storeInfo, contactInfo, policies }: FooterProps
           <div>
             <div className="mb-6">
               <Link href="/">
-                <Image 
-                  src={displayData.logoUrl} 
-                  alt={displayData.name} 
-                  width={120} 
-                  height={40} 
-                  className="h-10 w-auto"
-                />
+                {displayData.logoUrl && (
+                  <Image 
+                    src={displayData.logoUrl} 
+                    alt={displayData.name} 
+                    width={120} 
+                    height={40} 
+                    className="h-10 w-auto"
+                  />
+                )}
               </Link>
             </div>
-            <div 
-              className="text-gray-400 mb-6"
-              dangerouslySetInnerHTML={{ 
-                __html: displayData.footer || "Moto Edit là nhà phân phối các thiết bị và phụ kiện xe máy chính hãng"
-              }} 
-            />
+            {displayData.footer && (
+              <div 
+                className="text-gray-400 mb-6"
+                dangerouslySetInnerHTML={{ __html: displayData.footer }} 
+              />
+            )}
             <div className="flex space-x-4">
-              <a href={displayData.facebookUrl} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white">
-                <Facebook />
-              </a>
-              <a href={displayData.instagramUrl} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white">
-                <Instagram />
-              </a>
-              <a href={displayData.youtubeUrl} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white">
-                <Youtube />
-              </a>
+              {displayData.facebookUrl && (
+                <a href={displayData.facebookUrl} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white">
+                  <Facebook />
+                </a>
+              )}
+              {displayData.instagramUrl && (
+                <a href={displayData.instagramUrl} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white">
+                  <Instagram />
+                </a>
+              )}
+              {displayData.youtubeUrl && (
+                <a href={displayData.youtubeUrl} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white">
+                  <Youtube />
+                </a>
+              )}
             </div>
           </div>
 
@@ -98,28 +143,36 @@ export default function Footer({ storeInfo, contactInfo, policies }: FooterProps
           <div>
             <h3 className="text-lg font-semibold mb-6 text-red-500">Thông Tin Liên Hệ</h3>
             <ul className="space-y-4">
-              <li className="flex items-start">
-                <MapPin className="mr-2 text-red-500 mt-1" size={18} />
-                <span className="text-gray-400">{displayData.address}</span>
-              </li>
-              <li className="flex items-center">
-                <Phone className="mr-2 text-red-500" size={18} />
-                <a href={`tel:${displayData.phone}`} className="text-gray-400 hover:text-white">
-                  {displayData.phone}
-                </a>
-              </li>
-              <li className="flex items-center">
-                <Mail className="mr-2 text-red-500" size={18} />
-                <a href={`mailto:${displayData.email}`} className="text-gray-400 hover:text-white">
-                  {displayData.email}
-                </a>
-              </li>
-              <li className="flex items-start">
-                <Clock className="mr-2 text-red-500 mt-1" size={18} />
-                <span className="text-gray-400">
-                  {displayData.workingHoursFormatted}
-                </span>
-              </li>
+              {displayData.address && (
+                <li className="flex items-start">
+                  <MapPin className="mr-2 text-red-500 mt-1" size={18} />
+                  <span className="text-gray-400">{displayData.address}</span>
+                </li>
+              )}
+              {displayData.phone && (
+                <li className="flex items-center">
+                  <Phone className="mr-2 text-red-500" size={18} />
+                  <a href={`tel:${displayData.phone}`} className="text-gray-400 hover:text-white">
+                    {displayData.phone}
+                  </a>
+                </li>
+              )}
+              {displayData.email && (
+                <li className="flex items-center">
+                  <Mail className="mr-2 text-red-500" size={18} />
+                  <a href={`mailto:${displayData.email}`} className="text-gray-400 hover:text-white">
+                    {displayData.email}
+                  </a>
+                </li>
+              )}
+              {displayData.workingHoursFormatted && (
+                <li className="flex items-start">
+                  <Clock className="mr-2 text-red-500 mt-1" size={18} />
+                  <span className="text-gray-400">
+                    {formatWorkingHoursVietnamese(displayData.workingHoursFormatted)}
+                  </span>
+                </li>
+              )}
             </ul>
           </div>
 
@@ -139,12 +192,7 @@ export default function Footer({ storeInfo, contactInfo, policies }: FooterProps
                   </li>
                 ))
               ) : (
-                <>
-                  <li><Link href="/bao-hanh" className="text-gray-400 hover:text-white">Bảo hành</Link></li>
-                  <li><Link href="/van-chuyen" className="text-gray-400 hover:text-white">Vận chuyển</Link></li>
-                  <li><Link href="/doi-tra" className="text-gray-400 hover:text-white">Đổi trả</Link></li>
-                  <li><Link href="/dieu-khoan" className="text-gray-400 hover:text-white">Điều khoản</Link></li>
-                </>
+                <li className="text-gray-400">Không có chính sách nào</li>
               )}
             </ul>
           </div>
@@ -152,11 +200,7 @@ export default function Footer({ storeInfo, contactInfo, policies }: FooterProps
 
         {/* Copyright */}
         <div className="mt-12 pt-6 border-t border-gray-800 text-center text-gray-400">
-          <div 
-            dangerouslySetInnerHTML={{ 
-              __html: displayData.footer || `© ${new Date().getFullYear()} ${displayData.name}. All rights reserved.` 
-            }} 
-          />
+         Bản quyền © 2025. Thiết kế bởi Evosea
         </div>
       </div>
     </footer>

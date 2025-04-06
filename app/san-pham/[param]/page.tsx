@@ -33,13 +33,28 @@ interface Product {
   }[]
 }
 
-export default async function ProductPage({ params }: ProductPageProps) {
-  const { param } = params
+export const dynamicParams = false // Prevent fallback for non-generated routes
 
-  // Get main product
+export async function generateStaticParams() {
+  const products = await prisma.product.findMany({
+    select: { slug: true },
+    where: { isActive: true } // Only generate for active products
+  })
+  // Explicitly type the product parameter
+  return products.map((product: { slug: string }) => ({
+    param: product.slug,
+  }))
+}
+
+
+export default async function ProductPage({ params }: { params: { param: string } }) {
+  // Decode the slug from the URL parameter
+  const decodedSlug = decodeURIComponent(params.param)
+
+  // Get main product using the decoded slug
   const product = await prisma.product.findFirst({
     where: {
-      slug: param,
+      slug: decodedSlug,
       isActive: true
     },
     select: {

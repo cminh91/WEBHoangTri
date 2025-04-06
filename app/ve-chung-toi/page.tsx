@@ -187,24 +187,7 @@ async function AboutHeroSection() {
               `
             }}
           />
-          <ul className="mb-8 space-y-3">
-            <li className="flex items-center">
-              <CheckCircle className="mr-3 h-5 w-5 text-red-600" />
-              <span>Đội ngũ kỹ thuật viên được đào tạo chuyên nghiệp</span>
-            </li>
-            <li className="flex items-center">
-              <CheckCircle className="mr-3 h-5 w-5 text-red-600" />
-              <span>Trang thiết bị và công cụ hiện đại</span>
-            </li>
-            <li className="flex items-center">
-              <CheckCircle className="mr-3 h-5 w-5 text-red-600" />
-              <span>Phụ tùng chính hãng 100%</span>
-            </li>
-            <li className="flex items-center">
-              <CheckCircle className="mr-3 h-5 w-5 text-red-600" />
-              <span>Bảo hành dài hạn cho mọi dịch vụ</span>
-            </li>
-          </ul>
+       
           <Button className="bg-red-600 px-8 py-6 text-lg font-semibold text-white hover:bg-red-700">
             <Link href="/lien-he">Liên Hệ Ngay</Link>
           </Button>

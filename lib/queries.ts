@@ -374,40 +374,28 @@ export async function getStoreInfo() {
     const socialLinks = parseSocialLinks(contactInfo?.socialLinks);
 
     return {
-      name: storeInfo?.name || "MOTO EDIT",
-      address: contactInfo?.address || "123 Đường Lớn, Quận 1, TP. Hồ Chí Minh",
-      phone: storeInfo?.hotline || contactInfo?.phone || "0123456789",
-      hotline: storeInfo?.hotline || contactInfo?.phone || "0123456789",
-      email: contactInfo?.email || "info@motoedit.vn",
+      name: storeInfo?.name,
+      address: contactInfo?.address,
+      phone: storeInfo?.hotline || contactInfo?.phone,
+      hotline: storeInfo?.hotline || contactInfo?.phone,
+      email: contactInfo?.email,
       workingHours: contactInfo?.workingHours
         ? typeof contactInfo.workingHours === 'string'
           ? contactInfo.workingHours
           : JSON.stringify(contactInfo.workingHours)
-        : "8:00 - 17:30 (Thứ 2 - Thứ 7)",
-      facebookUrl: socialLinks?.facebook || "https://facebook.com",
-      instagramUrl: socialLinks?.instagram || "https://instagram.com",
-      youtubeUrl: socialLinks?.youtube || "https://youtube.com",
+        : null,
+      facebookUrl: socialLinks?.facebook,
+      instagramUrl: socialLinks?.instagram,
+      youtubeUrl: socialLinks?.youtube,
       youtubeVideoId: socialLinks?.youtube
-        ? socialLinks.youtube.split('v=')[1] || ""
-        : "",
-      logoUrl: storeInfo?.logo || "/logo.png",
-      footer: storeInfo?.footer || "Moto Edit là nhà phân phối các thiết bị và phụ kiện xe máy chính hãng" // Add footer with default value
+        ? socialLinks.youtube.split('v=')[1]
+        : null,
+      logoUrl: storeInfo?.logo,
+      footer: storeInfo?.footer
     };
   } catch (error) {
     console.error("Failed to fetch store info:", error)
-    return {
-      name: "MOTO EDIT",
-      address: "123 Đường Lớn, Quận 1, TP. Hồ Chí Minh",
-      phone: "0123456789", 
-      email: "info@motoedit.vn",
-      workingHours: "8:00 - 17:30 (Thứ 2 - Thứ 7)",
-      facebookUrl: "https://facebook.com",
-      instagramUrl: "https://instagram.com", 
-      youtubeUrl: "https://youtube.com",
-      youtubeVideoId: "",
-      logoUrl: "/logo.png",
-      footer: "Moto Edit là nhà phân phối các thiết bị và phụ kiện xe máy chính hãng" // Add default footer
-    }
+    return null
   }
 }
 

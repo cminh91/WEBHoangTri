@@ -28,7 +28,7 @@ export default function CategoryGrid({ categories }: CategoryGridProps) {
         </button>
       </div>
       {/* Container trắng chứa danh mục */}
-      <div className="bg-white shadow-md rounded-lg overflow-hidden">
+      <div className="bg-white shadow-md rounded-lg overflow-hidden p-1">
         <div className="grid grid-cols-2 md:grid-cols-4 border border-gray-300">
           {displayedCategories.map((category) => (
             <Link
@@ -55,14 +55,14 @@ export default function CategoryGrid({ categories }: CategoryGridProps) {
                     <Image
                       src={category.imageUrl}
                       alt={category.name}
-                      width={48}
-                      height={48}
+                      width={120}
+                      height={120}
                       className="object-contain"
                     />
                   )}
                 </div>
                 {/* Category Name */}
-                <span className="text-sm text-black font-medium text-center group-hover:text-white transition-colors">
+                <span className="text-xl text-black font-medium text-center group-hover:text-white transition-colors">
                   {category.name}
                 </span>
               </div>

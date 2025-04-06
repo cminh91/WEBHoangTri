@@ -28,9 +28,16 @@ export async function GET() {
 
 export async function POST(request: Request) {
   const session = await getServerSession(authOptions)
+  console.log("API Contact Session:", session)
 
-  if (!session || session.user.role !== "ADMIN") {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+  if (!session) {
+    console.log("No session found")
+    return NextResponse.json({ error: "Not authenticated" }, { status: 401 })
+  }
+
+  if (session.user.role !== "ADMIN") {
+    console.log("User is not ADMIN. Role:", session.user.role)
+    return NextResponse.json({ error: "Requires ADMIN role" }, { status: 403 })
   }
 
   try {
