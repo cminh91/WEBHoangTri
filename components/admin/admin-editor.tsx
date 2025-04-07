@@ -51,16 +51,58 @@ export default function AdminEditor({ value, onChange, height = 500, placeholder
           "insertdatetime",
           "media",
           "table",
-          "code",
+          "codesample",
           "help",
           "wordcount",
         ],
         toolbar:
-          "undo redo | blocks | fontselect fontsizeselect | " + // Added fontselect and fontsizeselect
-          "bold italic forecolor | alignleft aligncenter " +
-          "alignright alignjustify | bullist numlist outdent indent | " +
-          "removeformat | help",
-        content_style: "body { font-family:Helvetica,Arial,sans-serif; font-size:14px; }", // Keep base style, TinyMCE handles selection
+          "undo redo | styleselect fontselect fontsizeselect | " +
+          "bold italic underline strikethrough forecolor backcolor | " +
+          "alignleft aligncenter alignright alignjustify | " +
+          "bullist numlist outdent indent | " +
+          "link image media anchor codesample table | " +
+          "removeformat preview fullscreen | help",
+        style_formats: [
+          {
+            title: "Font chữ",
+            items: [
+              { title: "Arial", inline: "span", styles: { fontFamily: "Arial, sans-serif" } },
+              { title: "Courier New", inline: "span", styles: { fontFamily: "'Courier New', Courier, monospace" } },
+              { title: "Georgia", inline: "span", styles: { fontFamily: "Georgia, serif" } },
+              { title: "Tahoma", inline: "span", styles: { fontFamily: "Tahoma, sans-serif" } },
+              { title: "Times New Roman", inline: "span", styles: { fontFamily: "'Times New Roman', Times, serif" } },
+              { title: "Verdana", inline: "span", styles: { fontFamily: "Verdana, sans-serif" } },
+            ],
+          },
+          {
+            title: "Kích thước chữ",
+            items: [
+              { title: "Nhỏ", inline: "span", styles: { fontSize: "12px" } },
+              { title: "Bình thường", inline: "span", styles: { fontSize: "14px" } },
+              { title: "Lớn", inline: "span", styles: { fontSize: "18px" } },
+              { title: "Rất lớn", inline: "span", styles: { fontSize: "24px" } },
+            ],
+          },
+          {
+            title: "Tiêu đề",
+            items: [
+              { title: "Heading 1", block: "h1" },
+              { title: "Heading 2", block: "h2" },
+              { title: "Heading 3", block: "h3" },
+              { title: "Heading 4", block: "h4" },
+              { title: "Heading 5", block: "h5" },
+              { title: "Heading 6", block: "h6" },
+            ],
+          },
+          {
+            title: "Khác",
+            items: [
+              { title: "Đoạn trích", block: "blockquote" },
+              { title: "Đoạn code", block: "pre" },
+            ],
+          },
+        ],
+        content_style: "body { font-family:Helvetica,Arial,sans-serif; font-size:14px; }",
         placeholder: placeholder,
         skin: "oxide-dark",
         content_css: "dark",
