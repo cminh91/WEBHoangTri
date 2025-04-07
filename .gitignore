@@ -8,6 +8,8 @@
 
 # next.js
 /.next/
+.next.zip
+tailwind.config.zip
 /out/
 /build
 
@@ -45,3 +47,23 @@ build/
 .next/
 out/
 *.tsbuildinfo
+
+# Large files and build artifacts
+*.zip
+*.gz
+*.tar
+*.rar
+*.7z
+*.bundle
+*.chunk.*
+/_next/
+/.next/
+/out/
+/build/
+/dist/
+.cache/
+.temp/
+
+# Generated files
+.env.*.local
+.vercel
