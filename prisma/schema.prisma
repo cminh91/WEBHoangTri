@@ -160,6 +160,8 @@ enum CategoryType {
     checkoutId      String?   // External payment ID
     addressId       String?
     address         Address?  @relation(fields: [addressId], references: [id], onDelete: SetNull)
+    customerName    String?
+    customerPhone   String?
   
     @@index([userId])
     @@index([status])
@@ -197,8 +199,8 @@ enum CategoryType {
   // Address model
   model Address {
     id              String    @id @default(cuid())
-    userId          String
-    user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+    userId          String?
+    user            User?     @relation(fields: [userId], references: [id], onDelete: Cascade)
     name            String    // Recipient name
     phone           String
     address         String
@@ -496,5 +498,15 @@ enum CategoryType {
   enum DiscountType {
     PERCENTAGE
     FIXED_AMOUNT
+  }
+
+  model ServicePackage {
+    id          String   @id @default(cuid())
+    name        String
+    price       Decimal  @db.Decimal(10,2)
+    description String?  @db.LongText
+    features    Json?
+    createdAt   DateTime @default(now())
+    updatedAt   DateTime @updatedAt
   }
 

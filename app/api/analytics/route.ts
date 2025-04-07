@@ -113,6 +113,11 @@ export async function POST(request: Request) {
     const json = await request.json()
     const { path, referrer, device, browser, country } = json
 
+    // Bỏ qua nếu truy cập trang admin
+    if (path && path.startsWith('/admin')) {
+      return NextResponse.json({ success: true, skipped: true })
+    }
+
     // Get today's date with time set to 00:00:00
     const today = new Date()
     today.setHours(0, 0, 0, 0)

@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useState, useMemo, useCallback } from "react"
+import { useCart } from "@/components/cart/cart-provider"
 import Image from "next/image"
 import Link from "next/link"
 import { Star, ChevronLeft, ChevronRight } from "lucide-react"
@@ -43,6 +44,18 @@ export default function FeaturedProducts({ initialProducts, categories = [] }: F
   const [currentPage, setCurrentPage] = useState(0)
   const productsPerPage = 4
 
+  const { addItem } = useCart()
+
+  const handleAddToCart = (product: Product) => {
+    const image = product.images && product.images.length > 0 ? product.images[0] : "/product-placeholder.jpg"
+    addItem({
+      id: product.id,
+      name: product.name,
+      price: product.salePrice && product.salePrice < product.price ? product.salePrice : product.price,
+      image: image
+    })
+  }
+
   useEffect(() => {
     if (initialProducts && initialProducts.length > 0) {
       const enhancedProducts = initialProducts.map(product => ({
@@ -77,8 +90,8 @@ export default function FeaturedProducts({ initialProducts, categories = [] }: F
   // Filter products by category
   const filteredProducts = useMemo(() => {
     if (activeCategory === "all") return products
-    return products.filter(product => 
-      product.category?.slug === activeCategory || 
+    return products.filter(product =>
+      product.category?.slug === activeCategory ||
       product.categoryId === activeCategory
     )
   }, [products, activeCategory])
@@ -162,7 +175,7 @@ export default function FeaturedProducts({ initialProducts, categories = [] }: F
               <div key={product.id} className="group relative overflow-hidden bg-zinc-900 rounded-lg">
                 <Link href={`/san-pham/${product.slug}`}>
                   <div className="relative h-40 sm:h-48 w-full overflow-hidden">
-                    <Image 
+                    <Image
                       src={getValidImageUrl(product.images)}
                       alt={product.name}
                       fill
@@ -177,7 +190,7 @@ export default function FeaturedProducts({ initialProducts, categories = [] }: F
                   </div>
                 </Link>
                 <div className="p-4">
-                  <Link 
+                  <Link
                     href={`/san-pham/${product.slug}`}
                     className="block text-center font-medium text-white hover:text-red-500 transition-colors line-clamp-2 h-12"
                   >
@@ -194,9 +207,12 @@ export default function FeaturedProducts({ initialProducts, categories = [] }: F
                     )}
                   </div>
                 </div>
-                <div className="absolute bottom-0 left-0 right-0 bg-red-600 text-white text-center py-2 transform translate-y-full group-hover:translate-y-0 transition-transform duration-300">
+                <button
+                  onClick={() => handleAddToCart(product)}
+                  className="absolute bottom-0 left-0 right-0 bg-red-600 text-white text-center py-2 transform translate-y-full group-hover:translate-y-0 transition-transform duration-300"
+                >
                   MUA NGAY
-                </div>
+                </button>
               </div>
             ))
           ) : (
@@ -208,15 +224,15 @@ export default function FeaturedProducts({ initialProducts, categories = [] }: F
 
         {totalPages > 1 && (
           <div className="flex justify-center mt-8 gap-2">
-            <button 
-              onClick={goToPrevPage} 
+            <button
+              onClick={goToPrevPage}
               disabled={currentPage === 0}
               className="p-2 rounded-full bg-zinc-800 text-white disabled:opacity-50 hover:bg-red-600 transition-colors"
             >
               <ChevronLeft className="h-5 w-5" />
             </button>
-            <button 
-              onClick={goToNextPage} 
+            <button
+              onClick={goToNextPage}
               disabled={currentPage >= totalPages - 1}
               className="p-2 rounded-full bg-zinc-800 text-white disabled:opacity-50 hover:bg-red-600 transition-colors"
             >

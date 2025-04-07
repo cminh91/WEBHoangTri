@@ -11,22 +11,74 @@ import { useState } from "react"
 export default function CartPage() {
   const { items, removeItem, updateQuantity, totalPrice, clearCart } = useCart()
   const [isCheckingOut, setIsCheckingOut] = useState(false)
+  const [showCheckoutForm, setShowCheckoutForm] = useState(false)
+
+  const [name, setName] = useState('')
+  const [phone, setPhone] = useState('')
+  const [address, setAddress] = useState('')
+  const [city, setCity] = useState('')
+  const [district, setDistrict] = useState('')
+  const [ward, setWard] = useState('')
 
   const handleCheckout = async () => {
+    if (!showCheckoutForm) {
+      setShowCheckoutForm(true)
+      return
+    }
+
+    if (!name || !phone || !address) {
+      alert('Vui lòng nhập đầy đủ thông tin')
+      return
+    }
+
     setIsCheckingOut(true)
-    
-    // Here you would integrate with a payment gateway
-    // For this example, we'll just simulate a successful checkout
-    setTimeout(() => {
-      alert("Đặt hàng thành công! Chúng tôi sẽ liên hệ với bạn sớm nhất.")
+
+    try {
+      const res = await fetch('/api/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name,
+          phone,
+          address,
+          city,
+          district,
+          ward,
+          total: totalPrice,
+          items: items.map(item => ({
+            productId: item.id,
+            quantity: item.quantity,
+            price: item.price
+          }))
+        })
+      })
+
+      if (!res.ok) {
+        throw new Error('Lỗi khi đặt hàng')
+      }
+
+      const data = await res.json()
+      console.log('Order response:', data)
+      alert('Đặt hàng thành công! Chúng tôi sẽ liên hệ với bạn sớm nhất.')
       clearCart()
+      setShowCheckoutForm(false)
+      setName('')
+      setPhone('')
+      setAddress('')
+      setCity('')
+      setDistrict('')
+      setWard('')
+    } catch (error) {
+      console.error(error)
+      alert('Có lỗi xảy ra, vui lòng thử lại')
+    } finally {
       setIsCheckingOut(false)
-    }, 2000)
+    }
   }
 
   if (items.length === 0) {
     return (
-      <div className="container mx-auto px-4 py-16">
+      <div className="container mx-auto px-4 py-16 mt-40">
         <div className="mx-auto max-w-3xl text-center">
           <ShoppingBag className="mx-auto mb-4 h-12 w-12 text-zinc-500" />
           <h1 className="mb-4 text-2xl font-bold">Giỏ hàng của bạn đang trống</h1>
@@ -146,13 +198,60 @@ export default function CartPage() {
               <span>{formatCurrency(totalPrice)}</span>
             </div>
           </div>
+
+          {showCheckoutForm && (
+            <div className="mb-4 space-y-3">
+              <input
+                type="text"
+                placeholder="Họ và tên"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                className="w-full rounded-md border border-zinc-700 bg-zinc-900 p-2 text-white"
+              />
+              <input
+                type="text"
+                placeholder="Số điện thoại"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                className="w-full rounded-md border border-zinc-700 bg-zinc-900 p-2 text-white"
+              />
+              <input
+                type="text"
+                placeholder="Địa chỉ"
+                value={address}
+                onChange={(e) => setAddress(e.target.value)}
+                className="w-full rounded-md border border-zinc-700 bg-zinc-900 p-2 text-white"
+              />
+              <input
+                type="text"
+                placeholder="Thành phố"
+                value={city}
+                onChange={(e) => setCity(e.target.value)}
+                className="w-full rounded-md border border-zinc-700 bg-zinc-900 p-2 text-white"
+              />
+              <input
+                type="text"
+                placeholder="Quận/Huyện"
+                value={district}
+                onChange={(e) => setDistrict(e.target.value)}
+                className="w-full rounded-md border border-zinc-700 bg-zinc-900 p-2 text-white"
+              />
+              <input
+                type="text"
+                placeholder="Phường/Xã"
+                value={ward}
+                onChange={(e) => setWard(e.target.value)}
+                className="w-full rounded-md border border-zinc-700 bg-zinc-900 p-2 text-white"
+              />
+            </div>
+          )}
           
           <Button
             onClick={handleCheckout}
-            className="w-full bg-red-600 hover:bg-red-700"
+            className="w-full bg-red-600 hover:bg-red-700 mt-2"
             disabled={isCheckingOut}
           >
-            {isCheckingOut ? "Đang xử lý..." : "Tiến hành thanh toán"}
+            {isCheckingOut ? "Đang xử lý..." : showCheckoutForm ? "Xác nhận đặt hàng" : "Tiến hành thanh toán"}
           </Button>
           
           <div className="mt-4 space-y-2 text-sm text-gray-400">
@@ -166,4 +265,4 @@ export default function CartPage() {
       </div>
     </div>
   )
-} 
+}

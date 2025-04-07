@@ -34,6 +34,7 @@ import {
   getStoreInfo,
   getFeaturedServices,
   getPartners,
+  getServicePackages,
 } from "@/lib/queries"
 import { SliderDisplayProps } from "@/components/slider/slider-display"
 
@@ -48,6 +49,7 @@ export default async function Home() {
     storeInfo,
     services,
     partners,
+    servicePackages,
   ] = await Promise.all([
     getSliders(),
     getCategories(),
@@ -57,6 +59,7 @@ export default async function Home() {
     getStoreInfo(),
     getFeaturedServices(),
     getPartners(),
+    getServicePackages(),
     // Remove getProductCategories()
   ])
 
@@ -139,7 +142,7 @@ const formattedServices = services.map((service: { title?: string; description?:
       <TrustedPartners initialPartners={formattedPartners} />
       <TeamSlider teamMembers={formattedTeam} />
       <TeamMembers teamMembers={formattedTeam} />
-      <PricingSection />
+      <PricingSection servicePackages={servicePackages} hotline={storeInfo?.hotline || "0123456789"} />
     </main>
   )
 }

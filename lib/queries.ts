@@ -555,3 +555,19 @@ export async function getAnalyticsStats() {
     };
   }
 }
+export async function getServicePackages() {
+  try {
+    const packages = await prisma.servicePackage.findMany({
+      orderBy: { price: 'asc' }
+    })
+    return packages.map(pkg => ({
+      ...pkg,
+      price: Number(pkg.price),
+      features: Array.isArray(pkg.features) ? pkg.features : []
+    }))
+  } catch (error) {
+    console.error("Failed to fetch service packages:", error)
+    return []
+  }
+}
+

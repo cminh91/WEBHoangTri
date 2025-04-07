@@ -58,6 +58,8 @@ export default async function AdminLayout({
     { icon: <LayoutDashboard size={20} />, label: "Dashboard", href: "/admin" },
     { icon: <ShoppingBag size={20} />, label: "Danh mục", href: "/admin/categories" },
     { icon: <ShoppingBag size={20} />, label: "Sản Phẩm", href: "/admin/products" },
+    { icon: <Briefcase size={20} />, label: "Gói Dịch Vụ", href: "/admin/service-packages" },
+    { icon: <Users size={20} />, label: "Khách Hàng", href: "/admin/khach-hang" },
     { icon: <Wrench size={20} />, label: "Dịch Vụ", href: "/admin/services" },
     { icon: <FileText size={20} />, label: "Tin Tức", href: "/admin/news" },
     { icon: <MessageSquare size={20} />, label: "Tin Nhắn", href: "/admin/messages" },
