@@ -3,7 +3,20 @@
 import { useState, useEffect } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Users, Eye, MousePointer, Clock, ArrowUpRight, ArrowDownRight, Loader2 } from "lucide-react"
+import { Eye, ArrowUpRight, Loader2 } from "lucide-react"
+import { Line } from "react-chartjs-2"
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+} from "chart.js"
+
+ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend)
 import { toast } from "@/components/ui/use-toast"
 
 interface AnalyticsData {
@@ -40,6 +53,7 @@ export default function AnalyticsPage() {
           throw new Error("Failed to fetch analytics data")
         }
         const data = await response.json()
+        console.log("Dữ liệu analytics:", data)
         setAnalyticsData(data)
       } catch (error) {
         console.error("Error fetching analytics:", error)
@@ -76,6 +90,23 @@ export default function AnalyticsPage() {
     dailyData: [],
   }
 
+  let dailyData: { date: string; pageViews: number }[] = []
+
+  if (Array.isArray((data as any).analytics)) {
+    const grouped: Record<string, number> = {}
+
+    for (const item of (data as any).analytics) {
+      const dateStr = item.date.slice(0, 10) // yyyy-mm-dd
+      grouped[dateStr] = (grouped[dateStr] || 0) + (item.pageViews || 0)
+    }
+
+    dailyData = Object.entries(grouped)
+      .map(([date, pageViews]) => ({ date, pageViews }))
+      .sort((a, b) => a.date.localeCompare(b.date))
+  } else {
+    dailyData = []
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
@@ -94,8 +125,8 @@ export default function AnalyticsPage() {
         </Select>
       </div>
 
-      {/* Overview Cards */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      {/* Tổng lượt truy cập */}
+      <div className="grid gap-4 md:grid-cols-1 lg:grid-cols-1">
         <Card className="border-zinc-800 bg-zinc-950">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium">Tổng Lượt Truy Cập</CardTitle>
@@ -111,51 +142,54 @@ export default function AnalyticsPage() {
             </p>
           </CardContent>
         </Card>
-
-        <Card className="border-zinc-800 bg-zinc-950">
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">Người Dùng Duy Nhất</CardTitle>
-            <Users className="h-4 w-4 text-red-600" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {(data.uniqueVisitors || 0).toLocaleString()}
-            </div>
-            <p className="mt-1 flex items-center text-xs text-green-500">
-              <ArrowUpRight className="mr-1 h-3 w-3" />
-              8% so với tuần trước
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card className="border-zinc-800 bg-zinc-950">
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">Tỷ Lệ Thoát</CardTitle>
-            <MousePointer className="h-4 w-4 text-red-600" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{data.bounceRate}%</div>
-            <p className="mt-1 flex items-center text-xs text-red-500">
-              <ArrowDownRight className="mr-1 h-3 w-3" />
-              3% so với tuần trước
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card className="border-zinc-800 bg-zinc-950">
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">Thời Gian Trung Bình</CardTitle>
-            <Clock className="h-4 w-4 text-red-600" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{data.avgSessionDuration}s</div>
-            <p className="mt-1 flex items-center text-xs text-green-500">
-              <ArrowUpRight className="mr-1 h-3 w-3" />
-              10% so với tuần trước
-            </p>
-          </CardContent>
-        </Card>
       </div>
+
+      {/* Biểu đồ lượt truy cập theo ngày */}
+      <Card className="border-zinc-800 bg-zinc-950 mt-6 p-4">
+        <h2 className="mb-4 text-lg font-semibold">Biểu đồ lượt truy cập theo ngày</h2>
+        {dailyData.length === 0 ? (
+          <p className="text-center text-gray-400">Chưa có dữ liệu biểu đồ</p>
+        ) : (
+          <Line
+            data={{
+              labels: dailyData.map((d) => d.date),
+              datasets: [
+                {
+                  label: "Lượt truy cập",
+                  data: dailyData.map((d) => d.pageViews),
+                  borderColor: "rgb(239, 68, 68)",
+                  backgroundColor: "rgba(239, 68, 68, 0.5)",
+                  fill: true,
+                  tension: 0.3,
+                },
+              ],
+            }}
+            options={{
+              responsive: true,
+              plugins: {
+                legend: {
+                  labels: {
+                    color: "#fff",
+                  },
+                },
+                title: {
+                  display: false,
+                },
+              },
+              scales: {
+                x: {
+                  ticks: { color: "#ccc" },
+                  grid: { color: "#333" },
+                },
+                y: {
+                  ticks: { color: "#ccc" },
+                  grid: { color: "#333" },
+                },
+              },
+            }}
+          />
+        )}
+      </Card>
 
       {/* Top Pages */}
       <Card className="border-zinc-800 bg-zinc-950">

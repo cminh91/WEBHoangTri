@@ -16,7 +16,7 @@ export default async function WhyChooseUs() {
   })
 
   return (
-    <section className="bg-black py-16">
+    <section className="bg-black pt-0 pb-16 md:pt-16 md:pb-16">
       <div className="container mx-auto px-4">
         <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
           <div>

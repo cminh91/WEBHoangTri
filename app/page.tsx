@@ -1,7 +1,7 @@
 import dynamic from 'next/dynamic'
 
 const SliderDisplay = dynamic<SliderDisplayProps>(() => import("@/components/slider/slider-display").then(mod => mod.SliderDisplay), {
-  loading: () => <div className="w-full" style={{ paddingTop: "41.67%" }} />
+  loading: () => <div className="w-full" style={{ paddingTop: "60.67%" }} />
 })
 
 const CategoryGrid = dynamic(() => import("@/components/category-grid"))
@@ -21,10 +21,10 @@ const FeaturedProducts = dynamic(() => import("@/components/featured-products"),
   loading: () => <div className="py-16 bg-black" />
 })
 const NewsSection = dynamic(() => import("@/components/news-section"))
-// Add this import near the top with other dynamic imports
 const TeamSlider = dynamic(() => import("@/components/about/team-slider"), {
   loading: () => <div className="py-16 bg-black" />
 })
+
 import {
   getSliders,
   getCategories,
@@ -60,10 +60,9 @@ export default async function Home() {
     getFeaturedServices(),
     getPartners(),
     getServicePackages(),
-    // Remove getProductCategories()
   ])
 
-  // Format dữ liệu slider
+  // Format sliders
   const formattedSliders = sliders.map((slider: any) => ({
     ...slider,
     buttonText: null,
@@ -73,76 +72,120 @@ export default async function Home() {
     updatedAt: new Date()
   }))
 
-  // Format dữ liệu products
+  // Format products
   const formattedProducts = products.map((product: any) => ({
     ...product,
     slug: product.name.toLowerCase().replace(/\s+/g, '-'),
     description: "Mô tả sản phẩm",
     isActive: true,
-    // Thêm id vào category nếu category tồn tại
     category: product.category ? {
       ...product.category,
       id: product.categoryId || 'unknown-category-id'
     } : null
   }))
 
-  // Format dữ liệu team members
-  const formattedTeam = teamData.map((member: { id: string; name: string; position: string; image?: string; bio?: string; order: number }) => ({
+  // Format team members
+  const formattedTeam = teamData.map((member: any) => ({
     id: member.id,
     name: member.name,
     position: member.position,
-    image: member.image || '/placeholder-user.jpg',
-    bio: member.bio || 'Thông tin thành viên',
-    order: member.order
+    image: member.image ?? '/placeholder-user.jpg',
+    bio: member.bio ?? 'Thông tin thành viên',
+    order: member.order,
+    socialLinks: member.socialLinks ?? [],
+    email: member.email ?? '',
+    phone: member.phone ?? ''
   }))
-// Format dữ liệu services
-const formattedServices = services.map((service: { title?: string; description?: string; price?: number | string }) => ({
-  ...service,
-  slug: service.title?.toLowerCase().replace(/\s+/g, '-') || '',
-  description: service.description || 'Mô tả dịch vụ',
-  price: service.price ? Number(service.price.toString()) : null // format price
-}))
 
-  // Format dữ liệu partners
-  const formattedPartners = partners.map((partner: { id: string; name: string; logo: string; website: string; order: number }) => ({
+  // Format services
+  const formattedServices = services.map((service: any) => ({
+    id: service.id ?? '',
+    title: service.title ?? '',
+    slug: service.title ? service.title.toLowerCase().replace(/\s+/g, '-') : '',
+    description: service.description ?? 'Mô tả dịch vụ',
+    price: service.price ? Number(service.price.toString()) : null,
+    images: service.images ?? [],
+    category: service.category ?? null,
+    icon: service.icon ?? null,
+    isActive: service.isActive ?? true,
+    createdAt: service.createdAt ?? new Date(),
+    updatedAt: service.updatedAt ?? new Date(),
+    features: service.features ?? null
+  }))
+
+  // Format partners
+  const formattedPartners = partners.map((partner: any) => ({
     id: partner.id,
     name: partner.name,
     logo: partner.logo,
-    website: partner.website,
+    website: partner.website ?? '',
     order: partner.order
   }))
 
-
-  // Format dữ liệu news
-  const formattedNews = newsData.map((news: { title: string; content?: string }) => ({
-    ...news,
+  // Format news
+  const formattedNews = newsData.map((news: any) => ({
+    id: news.id ?? '',
+    title: news.title,
     slug: news.title.toLowerCase().replace(/\s+/g, '-'),
     excerpt: news.content?.substring(0, 100) + '...' || 'Mô tả tin tức',
     author: 'Admin',
-    categoryId: null,
+    categoryId: news.categoryId ?? null,
     isActive: true,
-    published: true
+    published: true,
+    publishDate: news.publishDate ?? new Date(),
+    images: news.images ?? [],
+    content: news.content ?? ''
+  }))
+
+  // Format servicePackages
+  const formattedServicePackages = servicePackages.map((pkg: any) => ({
+    ...pkg,
+    features: Array.isArray(pkg.features) ? pkg.features.map((f: any) => String(f)) : []
   }))
 
   return (
-    <main className="flex min-h-screen flex-col">
-      <SliderDisplay sliders={formattedSliders} />
-      <WhyChooseUs />
-      <SpecialServices initialServices={formattedServices} />
+    <main className="flex min-h-screen flex-col mt-2 md:mt-0">
+      <section className="mb-0 md:mb-8">
+        <SliderDisplay sliders={formattedSliders} />
+      </section>
+      <section className="mb-4 md:mb-8">
+        <WhyChooseUs />
+      </section>
+      <section className="mb-4 md:mb-8">
+        <SpecialServices initialServices={formattedServices} />
+      </section>
       {storeInfo && storeInfo.youtubeVideoId && (
-        <YouTubeSection videoId={storeInfo.youtubeVideoId} />
+        <section className="mb-4 md:mb-8">
+          <YouTubeSection videoId={storeInfo.youtubeVideoId} />
+        </section>
       )}
-      <CategoryGrid categories={categories} />
-      <FeaturedProducts 
-        initialProducts={formattedProducts} 
-        categories={categories}
-      />
-      <NewsSection initialNews={formattedNews} />
-      <StatsCounter />
-      <TrustedPartners initialPartners={formattedPartners} />
-      <TeamSlider teamMembers={formattedTeam} />
-      <TeamMembers teamMembers={formattedTeam} />
-      <PricingSection servicePackages={servicePackages} hotline={storeInfo?.hotline || "0123456789"} />
+      <section className="mb-4 md:mb-8">
+        <CategoryGrid categories={categories} />
+      </section>
+      <section className="mb-4 md:mb-8">
+        <FeaturedProducts
+          initialProducts={formattedProducts}
+          categories={categories}
+        />
+      </section>
+      <section className="mb-4 md:mb-8">
+        <NewsSection initialNews={formattedNews} />
+      </section>
+      <section className="mb-4 md:mb-8">
+        <StatsCounter />
+      </section>
+      <section className="mb-4 md:mb-8">
+        <TrustedPartners initialPartners={formattedPartners} />
+      </section>
+      <section className="mb-4 md:mb-8">
+        <TeamSlider teamMembers={formattedTeam} />
+      </section>
+      <section className="mb-4 md:mb-8">
+        <TeamMembers teamMembers={formattedTeam} />
+      </section>
+      <section className="mb-4 md:mb-8">
+        <PricingSection servicePackages={formattedServicePackages} hotline={storeInfo?.hotline || "0123456789"} />
+      </section>
     </main>
   )
 }

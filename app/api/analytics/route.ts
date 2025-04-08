@@ -53,7 +53,14 @@ export async function GET(request: Request) {
 
     // Get analytics data
     const analytics = await prisma.analytics.findMany({
-      where,
+      where: {
+        ...where,
+        NOT: {
+          path: {
+            startsWith: "/admin",
+          },
+        },
+      },
       orderBy: {
         date: "asc",
       },

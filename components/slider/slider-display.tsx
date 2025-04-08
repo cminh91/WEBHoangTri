@@ -42,7 +42,7 @@ export function SliderDisplay({ sliders }: SliderDisplayProps) {
   if (activeSliders.length === 0) return null
 
   return (
-    <div className="relative w-full h-[400px] sm:h-[500px] md:h-[600px] lg:h-[800px] overflow-hidden group">
+    <div className="relative w-full h-[400px] sm:h-[500px] md:h-[600px] lg:h-[800px] overflow-hidden group mt-0 md:mt-20">
       {activeSliders.map((slider, index) => (
         <div
           key={slider.id}
