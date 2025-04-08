@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
+import ContactForm from "@/components/contact/ContactForm"
 import { ChevronRight, Mail, MapPin, Phone } from "lucide-react"
 import Link from "next/link"
 import prisma from "@/lib/db"
@@ -18,7 +19,7 @@ interface WorkingHours {
 export default async function ContactPage() {
   const contactData = await prisma.contact.findFirst({
     select: {
-      address: true,
+      addresses: true,
       phone: true,
       email: true,
       workingHours: true,
@@ -31,8 +32,25 @@ export default async function ContactPage() {
 
   // Lấy workingHours từ contactData, đảm bảo kiểu dữ liệu là WorkingHours hoặc null
   const workingHours = contactData?.workingHours
-    ? (contactData.workingHours as WorkingHours)
+    ? (contactData.workingHours as unknown as WorkingHours)
     : null;
+
+  let addressText = "Địa chỉ chưa cập nhật";
+  if (contactData?.addresses) {
+    try {
+      const parsed = typeof contactData.addresses === 'string' ? JSON.parse(contactData.addresses) : contactData.addresses;
+      if (typeof parsed === 'string') {
+        addressText = parsed;
+      } else if (Array.isArray(parsed)) {
+        addressText = parsed.filter(Boolean).join('<br/>');
+      } else if (parsed && typeof parsed === 'object') {
+        const values = Object.values(parsed).filter(v => typeof v === 'string' && v.trim() !== '');
+        addressText = values.join('<br/>');
+      }
+    } catch (e) {
+      // ignore parse error
+    }
+  }
 
   // Map để dịch tên ngày sang tiếng Việt
   const vietnameseDayMap: { [key in keyof WorkingHours]: string } = {
@@ -75,7 +93,7 @@ export default async function ContactPage() {
                 <MapPin className="h-6 w-6" />
               </div>
               <h3 className="mb-3 text-xl font-bold">Địa Chỉ</h3>
-              <p className="text-gray-400 leading-relaxed">{contactData?.address || "Địa chỉ chưa cập nhật"}</p>
+              <p className="text-gray-400 leading-relaxed" dangerouslySetInnerHTML={{ __html: addressText }}></p>
             </div>
 
             <div className="bg-zinc-900/50 p-6 backdrop-blur-sm border border-zinc-800/50 hover:border-red-600/30 transition-colors">
@@ -135,77 +153,7 @@ export default async function ContactPage() {
             <h2 className="mb-6 text-2xl font-bold bg-gradient-to-r from-red-600 to-red-400 bg-clip-text text-transparent">
               Gửi Tin Nhắn Cho Chúng Tôi
             </h2>
-            <form className="space-y-6">
-              <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-                <div className="space-y-2">
-                  <label htmlFor="name" className="text-sm font-medium text-gray-300">
-                    Họ và Tên <span className="text-red-500">*</span>
-                  </label>
-                  <Input
-                    id="name"
-                    placeholder="Nhập họ và tên"
-                    className="border-zinc-700/50 bg-zinc-800/50 focus:border-red-500 transition-colors"
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label htmlFor="email" className="text-sm font-medium">
-                    Email <span className="text-red-600">*</span>
-                  </label>
-                  <Input
-                    id="email"
-                    type="email"
-                    placeholder="Nhập email"
-                    className="border-zinc-700 bg-zinc-800 focus:border-red-600"
-                    required
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-                <div className="space-y-2">
-                  <label htmlFor="phone" className="text-sm font-medium">
-                    Số Điện Thoại <span className="text-red-600">*</span>
-                  </label>
-                  <Input
-                    id="phone"
-                    placeholder="Nhập số điện thoại"
-                    className="border-zinc-700 bg-zinc-800 focus:border-red-600"
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label htmlFor="subject" className="text-sm font-medium">
-                    Chủ Đề
-                  </label>
-                  <Input
-                    id="subject"
-                    placeholder="Nhập chủ đề"
-                    className="border-zinc-700 bg-zinc-800 focus:border-red-600"
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <label htmlFor="message" className="text-sm font-medium">
-                  Tin Nhắn <span className="text-red-600">*</span>
-                </label>
-                <Textarea
-                  id="message"
-                  placeholder="Nhập tin nhắn"
-                  className="min-h-[150px] border-zinc-700 bg-zinc-800 focus:border-red-600"
-                  required
-                />
-              </div>
-
-              <Button 
-                type="submit" 
-                className="w-full bg-gradient-to-r from-red-600 to-red-500 py-6 text-lg font-medium
-                hover:from-red-700 hover:to-red-600 transition-all duration-300 shadow-lg"
-              >
-                Gửi Tin Nhắn
-              </Button>
-            </form>
+            <ContactForm />
 
             {/* Map */}
             <div className="mt-8 overflow-hidden border border-zinc-800/50">

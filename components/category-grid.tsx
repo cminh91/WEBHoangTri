@@ -37,14 +37,14 @@ export default function CategoryGrid({ categories }: CategoryGridProps) {
               className="flex flex-col items-center justify-center border border-gray-300 group relative aspect-square"
             >
               {/* Background Image */}
-              <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity">
+                <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity">
                 <Image
-                  src="https://i.imgur.com/UceQG3f.jpeg"
+                  src="/bg-danhmuc.png"
                   alt="Background Image"
-                  layout="fill"
+                  fill
                   className="object-cover"
                 />
-              </div>
+                </div>
               {/* Overlay */}
               <div className="absolute inset-0 bg-white group-hover:bg-transparent transition-colors"></div>
               {/* Content */}

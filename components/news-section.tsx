@@ -34,48 +34,9 @@ interface NewsSectionProps {
 }
 
 export default function NewsSection({ initialNews }: NewsSectionProps) {
-  const [news, setNews] = useState<NewsItem[]>([])
-  const [loading, setLoading] = useState(!initialNews)
+  const [news, setNews] = useState<NewsItem[]>(initialNews || [])
   const [featuredProducts, setFeaturedProducts] = useState<Product[]>([])
   const [currentProductIndex, setCurrentProductIndex] = useState(0)
-
-  useEffect(() => {
-    if (initialNews && initialNews.length > 0) {
-      const processedNews = initialNews.map(item => ({
-        ...item,
-        published: true
-      }))
-      setNews(processedNews)
-      setLoading(false)
-    } else {
-      const fetchNews = async () => {
-        try {
-          const response = await fetch('/api/news?limit=3')
-          if (!response.ok) throw new Error('Failed to fetch news')
-          const data = await response.json()
-          setNews(data.map((item: any) => ({ ...item, published: true })))
-        } catch (error) {
-          console.error('Error fetching news:', error)
-          setNews([])
-        } finally {
-          setLoading(false)
-        }
-      }
-      fetchNews()
-    }
-
-    const fetchProducts = async () => {
-      try {
-        const response = await fetch('/api/products/featured')
-        if (!response.ok) throw new Error('Failed to fetch featured products')
-        const data = await response.json()
-        setFeaturedProducts(data.slice(0, 3))
-      } catch (error) {
-        console.error('Error fetching featured products:', error)
-      }
-    }
-    fetchProducts()
-  }, [initialNews])
 
   useEffect(() => {
     if (featuredProducts.length > 1) {
@@ -103,19 +64,7 @@ export default function NewsSection({ initialNews }: NewsSectionProps) {
     return images[0]
   }
 
-  if (loading) {
-    return (
-      <section className="bg-black py-16">
-        <div className="container mx-auto px-4">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {[...Array(3)].map((_, i) => (
-              <div key={i} className="h-[250px] bg-gray-800 animate-pulse"></div>
-            ))}
-          </div>
-        </div>
-      </section>
-    )
-  }
+
 
   return (
     <section className="bg-black py-10 sm:py-16">
@@ -129,29 +78,32 @@ export default function NewsSection({ initialNews }: NewsSectionProps) {
         <div className="relative">
           {/* News grid */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-8">
-            {news.map((item) => (
-              <Link key={item.id} href={`/tin-tuc?category=/${item.slug}`}>
-                <div className="group relative h-[220px] sm:h-[250px] overflow-hidden rounded-lg">
-                  <Image
-                    src={getImageUrl(item.images)}
-                    alt={item.title}
-                    fill
-                    className="object-cover transition-transform duration-300 group-hover:scale-105"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div>
-                  <div className="absolute bottom-3 left-3 right-3 flex flex-col">
-                    <h3 className="mb-1.5 sm:mb-2 text-white font-bold line-clamp-2 text-sm sm:text-base">{item.title}</h3>
-                    <div className="flex items-center text-xs sm:text-sm text-gray-300 mb-1.5 sm:mb-2">
-                      <Calendar className="h-3.5 w-3.5 mr-1" />
-                      {formatDate(item.publishDate)}
+            {news.map((item) => {
+              console.log("Slug:", item.slug)
+              return (
+                <Link key={item.id} href={`/tin-tuc/${item.slug}`}>
+                  <div className="group relative h-[220px] sm:h-[250px] overflow-hidden rounded-lg">
+                    <Image
+                      src={getImageUrl(item.images)}
+                      alt={item.title}
+                      fill
+                      className="object-cover transition-transform duration-300 group-hover:scale-105"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div>
+                    <div className="absolute bottom-3 left-3 right-3 flex flex-col">
+                      <h3 className="mb-1.5 sm:mb-2 text-white font-bold line-clamp-2 text-sm sm:text-base">{item.title}</h3>
+                      <div className="flex items-center text-xs sm:text-sm text-gray-300 mb-1.5 sm:mb-2">
+                        <Calendar className="h-3.5 w-3.5 mr-1" />
+                        {formatDate(item.publishDate)}
+                      </div>
+                      <button className="self-start bg-red-600 px-4 py-1.5 sm:px-6 sm:py-2 text-xs sm:text-sm font-bold text-white hover:bg-red-700">
+                        XEM CHI TIẾT
+                      </button>
                     </div>
-                    <button className="self-start bg-red-600 px-4 py-1.5 sm:px-6 sm:py-2 text-xs sm:text-sm font-bold text-white hover:bg-red-700">
-                      XEM CHI TIẾT
-                    </button>
                   </div>
-                </div>
-              </Link>
-            ))}
+                </Link>
+              )
+            })}
           </div>
 
           {/* Featured product overlay */}

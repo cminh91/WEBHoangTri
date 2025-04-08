@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button"
 import Image from "next/image"
 import Link from "next/link"
 import prisma from "@/lib/db"
+import { getStoreInfo } from "@/lib/queries"
 import { SearchBar } from "@/components/products/search-bar"
 import { CategoryFilter } from "@/components/products/category-filter"
 import { ProductCard } from "@/components/products/product-card"
@@ -82,6 +83,8 @@ export default async function ProductsPage({
     take: 20
   })
 
+  const storeInfo = await getStoreInfo()
+
   return (
     <div className="min-h-screen bg-black pt-24">
       <div className="container mx-auto px-4 py-8 md:py-16">
@@ -128,7 +131,7 @@ export default async function ProductsPage({
               } as Product
               return (
                 <div key={product.id} className="transform transition-transform hover:scale-[1.02] duration-300">
-                  <ProductCard product={processedProduct} />
+                  <ProductCard product={processedProduct} storeLogoUrl={storeInfo?.logo ?? undefined} />
                 </div>
               );
             })}

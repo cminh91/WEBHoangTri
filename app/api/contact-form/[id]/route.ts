@@ -3,7 +3,10 @@ import { getServerSession } from "next-auth/next"
 import { authOptions } from "@/lib/auth"
 import prisma from "@/lib/db"
 
-export async function GET(request: Request, { params }: { params: { id: string } }) {
+export async function GET(request: Request, context: { params: Promise<{ id: string }> }) {
+  const { params } = context
+  const { id } = await params
+
   const session = await getServerSession(authOptions)
 
   if (!session || session.user.role !== "ADMIN") {
@@ -13,7 +16,7 @@ export async function GET(request: Request, { params }: { params: { id: string }
   try {
     const contactForm = await prisma.contactForm.findUnique({
       where: {
-        id: params.id,
+        id,
       },
     })
 
@@ -28,7 +31,10 @@ export async function GET(request: Request, { params }: { params: { id: string }
   }
 }
 
-export async function PATCH(request: Request, { params }: { params: { id: string } }) {
+export async function PATCH(request: Request, context: { params: Promise<{ id: string }> }) {
+  const { params } = context
+  const { id } = await params
+
   const session = await getServerSession(authOptions)
 
   if (!session || session.user.role !== "ADMIN") {
@@ -41,7 +47,7 @@ export async function PATCH(request: Request, { params }: { params: { id: string
 
     const contactForm = await prisma.contactForm.update({
       where: {
-        id: params.id,
+        id,
       },
       data: {
         read,
@@ -55,7 +61,10 @@ export async function PATCH(request: Request, { params }: { params: { id: string
   }
 }
 
-export async function DELETE(request: Request, { params }: { params: { id: string } }) {
+export async function DELETE(request: Request, context: { params: Promise<{ id: string }> }) {
+  const { params } = context
+  const { id } = await params
+
   const session = await getServerSession(authOptions)
 
   if (!session || session.user.role !== "ADMIN") {
@@ -65,7 +74,7 @@ export async function DELETE(request: Request, { params }: { params: { id: strin
   try {
     await prisma.contactForm.delete({
       where: {
-        id: params.id,
+        id,
       },
     })
 

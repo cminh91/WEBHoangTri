@@ -13,9 +13,10 @@ interface RelatedProductsProps {
       alt?: string | null
     }[]
   }[]
+  storeLogoUrl?: string
 }
 
-export default function RelatedProducts({ products }: RelatedProductsProps) {
+export default function RelatedProducts({ products, storeLogoUrl }: RelatedProductsProps) {
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat("vi-VN", {
       style: "currency",
@@ -40,6 +41,18 @@ export default function RelatedProducts({ products }: RelatedProductsProps) {
               sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
               className="object-cover transition-transform duration-300 group-hover:scale-105"
             />
+            <div className="absolute bottom-1 right-1 h-10 w-10 sm:h-12 sm:w-12 rounded-full p-1 overflow-hidden border-2 border-red-600 bg-black flex items-center justify-center">
+              {storeLogoUrl ? (
+                <Image
+                  src={storeLogoUrl}
+                  alt="Logo"
+                  fill
+                  className="object-contain rounded-full"
+                />
+              ) : (
+                <span className="text-xs sm:text-sm font-bold text-red-600">HT</span>
+              )}
+            </div>
           </div>
           <div className="p-4">
             <h3 className="text-lg font-semibold group-hover:text-red-600">{product.name}</h3>

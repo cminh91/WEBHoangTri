@@ -35,9 +35,10 @@ interface Category {
 interface FeaturedProductsProps {
   initialProducts?: Product[]
   categories?: Category[]
+  storeLogoUrl?: string
 }
 
-export default function FeaturedProducts({ initialProducts, categories = [] }: FeaturedProductsProps) {
+export default function FeaturedProducts({ initialProducts, categories = [], storeLogoUrl }: FeaturedProductsProps) {
   const [products, setProducts] = useState<Product[]>([])
   const [loading, setLoading] = useState(!initialProducts)
   const [activeCategory, setActiveCategory] = useState<string>("all")
@@ -180,13 +181,25 @@ export default function FeaturedProducts({ initialProducts, categories = [] }: F
                       alt={product.name}
                       fill
                       sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, 25vw"
-                      className="object-cover transition-transform duration-300 group-hover:scale-110"
+                      className="object-contain bg-black transition-transform duration-300"
                     />
                     {product.salePrice && product.salePrice < product.price && (
                       <div className="absolute top-0 right-0 bg-red-600 text-white text-xs font-bold px-2 py-1">
                         GIẢM GIÁ
                       </div>
                     )}
+                    <div className="absolute bottom-1 right-1 h-12 w-12 sm:h-14 sm:w-14 rounded-full p-1 overflow-hidden border-2 border-red-600 bg-black flex items-center justify-center">
+                      {storeLogoUrl ? (
+                        <Image
+                          src={storeLogoUrl}
+                          alt="Logo"
+                          fill
+                          className="object-contain rounded-full"
+                        />
+                      ) : (
+                        <span className="text-xs sm:text-sm font-bold text-red-600">HT</span>
+                      )}
+                    </div>
                   </div>
                 </Link>
                 <div className="p-4">

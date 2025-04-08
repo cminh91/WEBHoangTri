@@ -63,6 +63,7 @@ export default function MessagesPage() {
         const response = await fetch("/api/contact-form")
         if (response.ok) {
           const data = await response.json()
+          console.log("Contact form data:", data)
           setMessages(data)
         }
       } catch (error) {

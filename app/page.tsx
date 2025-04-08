@@ -126,7 +126,7 @@ export default async function Home() {
   const formattedNews = newsData.map((news: any) => ({
     id: news.id ?? '',
     title: news.title,
-    slug: news.title.toLowerCase().replace(/\s+/g, '-'),
+    slug: news.slug,
     excerpt: news.content?.substring(0, 100) + '...' || 'Mô tả tin tức',
     author: 'Admin',
     categoryId: news.categoryId ?? null,
@@ -166,6 +166,7 @@ export default async function Home() {
         <FeaturedProducts
           initialProducts={formattedProducts}
           categories={categories}
+          storeLogoUrl={storeInfo?.logo ?? undefined}
         />
       </section>
       <section className="mb-4 md:mb-8">

@@ -22,12 +22,12 @@ export async function GET(request: Request) {
 
   try {
     const { searchParams } = new URL(request.url)
-    const read = searchParams.get("read") === "true"
+    const readParam = searchParams.get("read")
 
     const where: any = {}
 
-    if (read !== null) {
-      where.read = read
+    if (readParam !== null) {
+      where.read = readParam === "true"
     }
 
     const contactForms = await prisma.contactForm.findMany({

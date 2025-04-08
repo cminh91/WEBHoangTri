@@ -7,9 +7,10 @@ import { Product } from "@/types"
 
 interface ProductCardProps {
   product: Product
+  storeLogoUrl?: string
 }
 
-export function ProductCard({ product }: ProductCardProps) {
+export function ProductCard({ product, storeLogoUrl }: ProductCardProps) {
   return (
     <div className="overflow-hidden rounded-lg bg-zinc-900">
       {product.featured && (
@@ -31,6 +32,18 @@ export function ProductCard({ product }: ProductCardProps) {
             }}
             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
           />
+          <div className="absolute bottom-1 right-1 h-10 w-10 sm:h-12 sm:w-12 rounded-full p-1 overflow-hidden border-2 border-red-600 bg-black flex items-center justify-center">
+            {storeLogoUrl ? (
+              <Image
+                src={storeLogoUrl}
+                alt="Logo"
+                fill
+                className="object-contain rounded-full"
+              />
+            ) : (
+              <span className="text-xs sm:text-sm font-bold text-red-600">HT</span>
+            )}
+          </div>
         </div>
         <div className="p-4">
           <h2 className="mb-2 text-lg font-semibold">{product.name}</h2>
