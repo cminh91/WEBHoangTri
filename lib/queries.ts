@@ -240,11 +240,16 @@ export async function getFeaturedServices() {
         featured: true,
         isActive: true
       },
-      include: { // Thêm include để lấy images
+      include: {
         images: {
           select: {
             url: true,
             alt: true
+          }
+        },
+        category: {
+          include: {
+            parent: true
           }
         }
       }
@@ -375,40 +380,29 @@ export async function getStoreInfo() {
     const socialLinks = parseSocialLinks(contactInfo?.socialLinks);
 
     return {
-      name: storeInfo?.name || "MOTO EDIT",
-      address: contactInfo?.address || "123 Đường Lớn, Quận 1, TP. Hồ Chí Minh",
-      phone: storeInfo?.hotline || contactInfo?.phone || "0123456789",
-      hotline: storeInfo?.hotline || contactInfo?.phone || "0123456789",
-      email: contactInfo?.email || "info@motoedit.vn",
+      name: storeInfo?.name ?? null,
+      addresses: contactInfo?.addresses ?? null,
+      phone: storeInfo?.hotline ?? contactInfo?.phone ?? null,
+      hotline: storeInfo?.hotline ?? contactInfo?.phone ?? null,
+      email: contactInfo?.email ?? null,
       workingHours: contactInfo?.workingHours
         ? typeof contactInfo.workingHours === 'string'
           ? contactInfo.workingHours
           : JSON.stringify(contactInfo.workingHours)
-        : "8:00 - 17:30 (Thứ 2 - Thứ 7)",
-      facebookUrl: socialLinks?.facebook || "https://facebook.com",
-      instagramUrl: socialLinks?.instagram || "https://instagram.com",
-      youtubeUrl: socialLinks?.youtube || "https://youtube.com",
+        : null,
+      facebookUrl: socialLinks?.facebook ?? null,
+      instagramUrl: socialLinks?.instagram ?? null,
+      youtubeUrl: socialLinks?.youtube ?? null,
       youtubeVideoId: socialLinks?.youtube
-        ? socialLinks.youtube.split('v=')[1] || ""
-        : "",
-      logoUrl: storeInfo?.logo || "/logo.png",
-      footer: storeInfo?.footer || "Moto Edit là nhà phân phối các thiết bị và phụ kiện xe máy chính hãng" // Add footer with default value
+        ? (socialLinks.youtube.split('v=')[1] || null)
+        : null,
+      logoUrl: storeInfo?.logo ?? null,
+      logo: storeInfo?.logo ?? null,
+      footer: storeInfo?.footer ?? null
     };
   } catch (error) {
     console.error("Failed to fetch store info:", error)
-    return {
-      name: "MOTO EDIT",
-      address: "123 Đường Lớn, Quận 1, TP. Hồ Chí Minh",
-      phone: "0123456789", 
-      email: "info@motoedit.vn",
-      workingHours: "8:00 - 17:30 (Thứ 2 - Thứ 7)",
-      facebookUrl: "https://facebook.com",
-      instagramUrl: "https://instagram.com", 
-      youtubeUrl: "https://youtube.com",
-      youtubeVideoId: "",
-      logoUrl: "/logo.png",
-      footer: "Moto Edit là nhà phân phối các thiết bị và phụ kiện xe máy chính hãng" // Add default footer
-    }
+    return null
   }
 }
 
@@ -447,7 +441,7 @@ export async function getContactInfo() {
   try {
     const contact = await prisma.contact.findFirst({
       select: {
-        address: true,
+        addresses: true,
         phone: true,
         email: true,
         workingHours: true, // Dạng JSON
@@ -570,4 +564,3 @@ export async function getServicePackages() {
     return []
   }
 }
-

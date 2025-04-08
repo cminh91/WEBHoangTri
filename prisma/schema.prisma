@@ -264,7 +264,7 @@ enum CategoryType {
   // Contact model
   model Contact {
     id              String    @id @default(cuid())
-    address         String
+    addresses       Json?
     phone           String
     email           String
     workingHours    Json?

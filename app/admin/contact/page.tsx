@@ -17,7 +17,7 @@ export default function ContactPage() {
 
   // Form state
   const [formData, setFormData] = useState({
-    address: "",
+    addresses: [""], // danh sách chi nhánh, mặc định 1 ô trống
     phone: "",
     email: "",
     mapUrl: "",
@@ -50,6 +50,7 @@ export default function ContactPage() {
             setFormData(prev => ({
               ...prev,
               ...data,
+              addresses: Array.isArray(data.addresses) ? data.addresses : [data.address || ""],
               workingHours: {
                 ...prev.workingHours,
                 ...(data.workingHours || {})
@@ -80,8 +81,18 @@ export default function ContactPage() {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target
 
+    if (name.startsWith("addresses[")) {
+      const index = parseInt(name.match(/addresses\[(\d+)\]/)?.[1] || "-1")
+      if (index >= 0) {
+        setFormData(prev => {
+          const updated = [...prev.addresses]
+          updated[index] = value
+          return { ...prev, addresses: updated }
+        })
+      }
+    }
     // Handle nested properties
-    if (name.includes(".")) {
+    else if (name.includes(".")) {
       const [parent, child] = name.split(".")
       setFormData((prev) => {
         const parentObj = prev[parent as keyof typeof prev]
@@ -108,7 +119,7 @@ export default function ContactPage() {
 
     try {
       // Validate form
-      if (!formData.address || !formData.phone || !formData.email) {
+      if (!formData.addresses.length || formData.addresses.some(addr => !addr.trim()) || !formData.phone || !formData.email) {
         throw new Error("Vui lòng điền đầy đủ thông tin bắt buộc")
       }
 
@@ -176,19 +187,45 @@ export default function ContactPage() {
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid gap-4 md:grid-cols-2">
-              <div className="space-y-2">
-                <Label htmlFor="address">
-                  Địa Chỉ <span className="text-red-500">*</span>
+              <div className="space-y-2 md:col-span-2">
+                <Label>
+                  Địa Chỉ Chi Nhánh <span className="text-red-500">*</span>
                 </Label>
-                <Textarea
-                  id="address"
-                  name="address"
-                  value={formData.address}
-                  onChange={handleChange}
-                  placeholder="Nhập địa chỉ cửa hàng"
-                  className="min-h-[80px] border-zinc-700 bg-zinc-800 focus:border-red-600"
-                  required
-                />
+                {formData.addresses.map((addr, idx) => (
+                  <div key={idx} className="flex items-start space-x-2 mb-2">
+                    <Textarea
+                      name={`addresses[${idx}]`}
+                      value={addr}
+                      onChange={handleChange}
+                      placeholder={`Nhập địa chỉ chi nhánh #${idx + 1}`}
+                      className="min-h-[80px] border-zinc-700 bg-zinc-800 focus:border-red-600 flex-1"
+                      required
+                    />
+                    <Button
+                      type="button"
+                      variant="destructive"
+                      onClick={() => {
+                        setFormData(prev => {
+                          const updated = [...prev.addresses]
+                          updated.splice(idx, 1)
+                          return { ...prev, addresses: updated.length ? updated : [""] }
+                        })
+                      }}
+                    >
+                      X
+                    </Button>
+                  </div>
+                ))}
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="mt-2"
+                  onClick={() => {
+                    setFormData(prev => ({ ...prev, addresses: [...prev.addresses, ""] }))
+                  }}
+                >
+                  + Thêm Chi Nhánh
+                </Button>
               </div>
 
               <div className="space-y-4">

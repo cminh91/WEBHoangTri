@@ -119,7 +119,7 @@ export default function NewsSection({ initialNews }: NewsSectionProps) {
 
   return (
     <section className="bg-black py-10 sm:py-16">
-      <div className="container mx-auto px-3 sm:px-4">
+      <div className="container mx-auto px-3 sm:px-4 relative">
         <div className="mb-6 sm:mb-8 flex flex-col sm:flex-row sm:items-center">
           <div className="mb-3 sm:mb-0 mr-0 sm:mr-4 bg-red-600 px-3 py-1.5 sm:px-4 sm:py-2 text-base sm:text-lg font-bold uppercase text-white">Tin tức</div>
           <div className="h-[1px] sm:flex-grow bg-gray-700"></div>
@@ -156,8 +156,8 @@ export default function NewsSection({ initialNews }: NewsSectionProps) {
 
           {/* Featured product overlay */}
           {featuredProducts.length > 0 && (
-            <div className="absolute inset-x-0 bottom-0 sm:top-1/2 sm:left-1/2 sm:transform sm:-translate-x-1/2 sm:-translate-y-1/2 z-10 sm:mt-40 flex justify-center">
-              <div className="bg-black/80 p-4 sm:p-6 rounded-lg shadow-xl w-full max-w-xs sm:max-w-md text-center">
+            <div className="absolute inset-x-0 bottom-20 sm:top-1/2 sm:left-1/2 sm:transform sm:-translate-x-1/2 sm:-translate-y-1/2 z-10 mt-10 sm:mt-10 flex justify-center">
+              <div className="p-4 sm:p-6 rounded-lg shadow-xl w-full max-w-xs sm:max-w-md text-center">
                 <div className="relative h-40 w-40 sm:h-48 sm:w-48 mx-auto mb-3 sm:mb-4">
                   {featuredProducts.map((product, index) => (
                     <div

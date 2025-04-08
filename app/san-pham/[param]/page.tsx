@@ -34,7 +34,7 @@ interface Product {
   }[]
 }
 
-export const dynamicParams = false // Prevent fallback for non-generated routes
+export const dynamicParams = true // Allow fallback for non-generated routes
 
 export async function generateStaticParams() {
   const products = await prisma.product.findMany({
@@ -48,8 +48,9 @@ export async function generateStaticParams() {
 }
 
 
-export default async function ProductPageWrapper({ params }: { params: { param: string } }) {
-  const decodedSlug = decodeURIComponent(params.param)
+export default async function ProductPageWrapper({ params }: { params: any }) {
+  const resolvedParams = await params
+  const decodedSlug = decodeURIComponent(resolvedParams.param)
 
   const product = await prisma.product.findFirst({
     where: {

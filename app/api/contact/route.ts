@@ -6,7 +6,7 @@ import { z } from "zod"
 
 // Schema for contact validation
 const contactSchema = z.object({
-  address: z.string().min(1, "Address is required"),
+  addresses: z.array(z.string().min(1, "Address is required")).min(1, "At least one address required"),
   phone: z.string().min(1, "Phone is required"),
   email: z.string().email("Invalid email address"),
   workingHours: z.record(z.string()).optional(),

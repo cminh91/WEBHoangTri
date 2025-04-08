@@ -3,25 +3,21 @@
 /.pnp
 .pnp.js
 
-# testing
-/coverage
-
-# next.js
+# build output
 /.next/
-.next.zip
-tailwind.config.zip
 /out/
-/build
+/build/
+/dist/
 
-# misc
-.DS_Store
-*.pem
+# cache
+.cache/
+*.tsbuildinfo
 
 # env files
 .env*
 !.env.example
 
-# debug
+# debug & logs
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
@@ -29,41 +25,14 @@ yarn-error.log*
 # IDE
 .idea/
 .vscode/
-*.sublime-*
 *.swp
-*.swo
 
 # OS
-.DS_Store*
+.DS_Store
 Thumbs.db
-desktop.ini
-._*
-.Spotlight-V100
-.Trashes
 
-# Build
-dist/
-build/
-.next/
-out/
-*.tsbuildinfo
-
-# Large files and build artifacts
+# archives
 *.zip
 *.gz
 *.tar
 *.rar
-*.7z
-*.bundle
-*.chunk.*
-/_next/
-/.next/
-/out/
-/build/
-/dist/
-.cache/
-.temp/
-
-# Generated files
-.env.*.local
-.vercel

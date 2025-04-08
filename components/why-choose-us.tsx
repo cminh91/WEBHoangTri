@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import prisma from "@/lib/db"
+import { getStoreInfo } from "@/lib/queries";
 
 export default async function WhyChooseUs() {
   // Fetch about data from database
@@ -13,14 +14,15 @@ export default async function WhyChooseUs() {
         take: 1
       }
     }
-  })
+  });
 
+  const storeInfo = await getStoreInfo();
   return (
     <section className="bg-black pt-0 pb-16 md:pt-16 md:pb-16">
       <div className="container mx-auto px-4">
         <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
           <div>
-            <h2 className="mb-6 text-4xl">
+            <h2 className="mb-6 text-4xl text-red-600 font-bold uppercase">
               {aboutData?.title || "Tại sao lại chọn chúng tôi"}
             </h2>
             <div 
@@ -47,9 +49,18 @@ export default async function WhyChooseUs() {
                 loading="lazy"
                 priority={false}
               />
-              <div className="absolute bottom-8 right-8 h-20 w-20 rounded-full bg-white p-2">
-                <div className="flex h-full w-full items-center justify-center rounded-full border-2 border-red-600">
-                  <span className="text-xl font-bold text-red-600">HT</span>
+              <div className="absolute bottom-8 right-8 h-20 w-20 rounded-full p-0">
+                <div className="flex h-full w-full items-center justify-center rounded-full border-2 border-red-600 bg-black">
+                  {storeInfo?.logo ? (
+                    <Image
+                      src={storeInfo.logo}
+                      alt="Logo"
+                      fill
+                      className="object-contain rounded-full"
+                    />
+                  ) : (
+                    <span className="text-xl font-bold text-red-600">HT</span>
+                  )}
                 </div>
               </div>
             </div>

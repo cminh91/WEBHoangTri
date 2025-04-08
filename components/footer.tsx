@@ -1,11 +1,11 @@
 "use client"
 
-import { Facebook, Instagram, Youtube, MapPin, Phone, Mail, Clock } from "lucide-react"
+import { Facebook, Instagram, Youtube, MapPin, Phone, Mail, Clock, } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
 
 interface ContactInfoType {
-  address?: string | null
+  addresses?: string[] | null
   phone?: string | null
   email?: string | null
   workingHours?: any | null
@@ -74,7 +74,7 @@ export default function Footer({ storeInfo, contactInfo, policies }: FooterProps
     name: storeInfo?.name || "",
     logoUrl: storeInfo?.logoUrl || storeInfo?.logo || "",
     footer: storeInfo?.footer || "",
-    address: contactInfo?.address || "",
+    addresses: contactInfo?.addresses || [],
     phone: contactInfo?.phone || "",
     email: contactInfo?.email || "",
     workingHoursFormatted: contactInfo?.workingHoursFormatted || "",
@@ -89,18 +89,21 @@ export default function Footer({ storeInfo, contactInfo, policies }: FooterProps
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {/* Company Info */}
           <div>
-            <div className="mb-6">
+            <div className="mb-6 flex items-center space-x-2">
               <Link href="/">
                 {displayData.logoUrl && (
-                  <Image 
-                    src={displayData.logoUrl} 
-                    alt={displayData.name} 
-                    width={120} 
-                    height={40} 
+                  <Image
+                    src={displayData.logoUrl}
+                    alt={displayData.name}
+                    width={120}
+                    height={40}
                     className="h-10 w-auto"
                   />
                 )}
               </Link>
+              {displayData.name && (
+                <span className="text-lg font-semibold">{displayData.name}</span>
+              )}
             </div>
             {displayData.footer && (
               <div 
@@ -111,17 +114,23 @@ export default function Footer({ storeInfo, contactInfo, policies }: FooterProps
             <div className="flex space-x-4">
               {displayData.facebookUrl && (
                 <a href={displayData.facebookUrl} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white">
-                  <Facebook />
+                  <Facebook className="w-6 h-6" />
                 </a>
               )}
               {displayData.instagramUrl && (
                 <a href={displayData.instagramUrl} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white">
-                  <Instagram />
+                  <Image
+                    src="https://cliply.co/wp-content/uploads/2021/02/372102780_TIKTOK_ICON_1080.png"
+                    alt="TikTok"
+                    width={24}
+                    height={24}
+                    className="w-6 h-6 object-contain"
+                  />
                 </a>
               )}
               {displayData.youtubeUrl && (
                 <a href={displayData.youtubeUrl} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white">
-                  <Youtube />
+                  <Youtube className="w-6 h-6" />
                 </a>
               )}
             </div>
@@ -143,12 +152,12 @@ export default function Footer({ storeInfo, contactInfo, policies }: FooterProps
           <div>
             <h3 className="text-lg font-semibold mb-6 text-red-500">Thông Tin Liên Hệ</h3>
             <ul className="space-y-4">
-              {displayData.address && (
-                <li className="flex items-start">
-                  <MapPin className="mr-2 text-red-500 mt-1" size={18} />
-                  <span className="text-gray-400">{displayData.address}</span>
+              {displayData.addresses && displayData.addresses.length > 0 && displayData.addresses.map((addr, idx) => (
+                <li key={idx} className="flex items-start">
+                  <MapPin className="mr-2 text-red-500 mt-1" size={24} />
+                  <span className="text-gray-400">{addr}</span>
                 </li>
-              )}
+              ))}
               {displayData.phone && (
                 <li className="flex items-center">
                   <Phone className="mr-2 text-red-500" size={18} />
@@ -167,7 +176,7 @@ export default function Footer({ storeInfo, contactInfo, policies }: FooterProps
               )}
               {displayData.workingHoursFormatted && (
                 <li className="flex items-start">
-                  <Clock className="mr-2 text-red-500 mt-1" size={18} />
+                  <Clock className="mr-2 text-red-500 mt-1" size={60} />
                   <span className="text-gray-400">
                     {formatWorkingHoursVietnamese(displayData.workingHoursFormatted)}
                   </span>

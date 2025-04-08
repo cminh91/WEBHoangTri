@@ -3,6 +3,7 @@ import { CheckCircle, ChevronRight, Users, Wrench, Award, Clock } from "lucide-r
 import Image from "next/image"
 import Link from "next/link"
 import prisma from "@/lib/db"
+import { getStoreInfo } from "@/lib/queries"
 import TestimonialsServer from "@/components/about/testimonials-server"
 import { Suspense } from "react"
 import type { Metadata } from "next"
@@ -155,6 +156,7 @@ export default async function AboutUsPage() {
 
 // Tách phần Hero Section thành component riêng để sử dụng Suspense
 async function AboutHeroSection() {
+  const storeInfo = await getStoreInfo();
   // Lấy dữ liệu từ database với xử lý lỗi
   let aboutData;
   try {
@@ -174,11 +176,9 @@ async function AboutHeroSection() {
     <>
       <div className="mb-16 grid grid-cols-1 gap-12 md:grid-cols-2">
         <div>
-          <h1 className="mb-6 text-4xl font-bold uppercase">
-            {aboutData?.title || "Hoàng Trí Moto"}
-            <br />
-            <span className="text-red-600">Hoàng Trí Đắk Lắk</span>
-          </h1>
+        <h2 className="mb-6 text-4xl text-red-600 font-bold uppercase">
+              {aboutData?.title || "Tại sao lại chọn chúng tôi"}
+            </h2>
           <div
             className="mb-8 text-gray-300"
             dangerouslySetInnerHTML={{
@@ -203,9 +203,18 @@ async function AboutHeroSection() {
               className="h-full w-full object-cover"
               priority
             />
-            <div className="absolute bottom-8 right-8 h-20 w-20 rounded-full bg-white p-2">
-              <div className="flex h-full w-full items-center justify-center rounded-full border-2 border-red-600">
-                <span className="text-xl font-bold text-red-600">HT</span>
+            <div className="absolute bottom-8 right-8 h-20 w-20 rounded-full p-0">
+              <div className="flex h-full w-full items-center justify-center rounded-full border-2 border-red-600 bg-black">
+                {storeInfo?.logo ? (
+                  <Image
+                    src={storeInfo.logo}
+                    alt="Logo"
+                    fill
+                    className="object-contain rounded-full"
+                  />
+                ) : (
+                  <span className="text-xl font-bold text-red-600">HT</span>
+                )}
               </div>
             </div>
           </div>

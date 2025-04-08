@@ -8,22 +8,48 @@ import type { Metadata } from "next"
 
 interface ServicePageProps {
   params: {
-    param: string
+    param: string[]
   }
 }
 
 export async function generateMetadata({ params }: ServicePageProps): Promise<Metadata> {
   const resolvedParams = await params;
-  const { param } = resolvedParams;
+  const paramArray = resolvedParams.param as string[];
+
+  let categorySlug = paramArray[0];
+  let serviceSlug = paramArray.length === 2 ? paramArray[1] : null;
 
   try {
-    // Kiểm tra xem param có phải là một danh mục không
     const category = await prisma.category.findFirst({
-      where: { 
-        slug: param,
-        type: "SERVICE" 
+      where: {
+        slug: categorySlug,
+        type: "SERVICE"
       }
     });
+
+    if (serviceSlug && category) {
+      const service = await prisma.service.findFirst({
+        where: {
+          slug: serviceSlug,
+          categoryId: category.id
+        },
+        include: {
+          category: true
+        }
+      });
+
+      if (service) {
+        return {
+          title: `${service.title} | Hoàng Trí Moto`,
+          description: service.metaDescription || service.description?.substring(0, 160),
+          openGraph: {
+            title: `${service.title} | Hoàng Trí Moto`,
+            description: service.metaDescription || service.description?.substring(0, 160),
+            images: service.icon ? [{ url: service.icon }] : [],
+          },
+        };
+      }
+    }
 
     if (category) {
       return {
@@ -32,26 +58,27 @@ export async function generateMetadata({ params }: ServicePageProps): Promise<Me
       };
     }
 
-    // Nếu không phải danh mục, thử tìm dịch vụ
-    const service = await prisma.service.findFirst({
-      where: {
-        slug: param,
-      },
-      include: {
-        category: true,
-      },
-    });
+    if (serviceSlug) {
+      const service = await prisma.service.findFirst({
+        where: {
+          slug: serviceSlug
+        },
+        include: {
+          category: true
+        }
+      });
 
-    if (service) {
-      return {
-        title: `${service.title} | Hoàng Trí Moto`,
-        description: service.metaDescription || service.description?.substring(0, 160),
-        openGraph: {
+      if (service) {
+        return {
           title: `${service.title} | Hoàng Trí Moto`,
           description: service.metaDescription || service.description?.substring(0, 160),
-          images: service.icon ? [{ url: service.icon }] : [],
-        },
-      };
+          openGraph: {
+            title: `${service.title} | Hoàng Trí Moto`,
+            description: service.metaDescription || service.description?.substring(0, 160),
+            images: service.icon ? [{ url: service.icon }] : [],
+          },
+        };
+      }
     }
 
     return {
@@ -69,49 +96,56 @@ export async function generateMetadata({ params }: ServicePageProps): Promise<Me
 
 export default async function ServicePage({ params }: ServicePageProps) {
   const resolvedParams = await params;
-  const { param } = resolvedParams;
+  const paramArray = resolvedParams.param as string[];
 
-  if (param.includes('/')) {
-    redirect(`/dich-vu/${param}`);
-  }
+  let categorySlug = paramArray[0];
+  let serviceSlug = paramArray.length === 2 ? paramArray[1] : null;
 
   try {
-    // Kiểm tra xem param có phải là một danh mục không
     const category = await prisma.category.findFirst({
-      where: { 
-        slug: param,
-        type: "SERVICE" 
+      where: {
+        slug: categorySlug,
+        type: "SERVICE"
       }
     });
 
+    if (serviceSlug && category) {
+      const service = await prisma.service.findFirst({
+        where: {
+          slug: serviceSlug,
+          categoryId: category.id
+        },
+        include: {
+          category: true,
+          images: true
+        }
+      });
+
+      if (service) {
+        return await renderServicePage(service);
+      }
+    }
+
     if (category) {
-      // Hiển thị trang danh mục
       return await renderCategoryPage(category);
     }
 
-    // Nếu không phải danh mục, thử tìm dịch vụ
-    const service = await prisma.service.findFirst({
-      where: {
-        slug: param,
-      },
-      include: {
-        category: true,
-        images: true,
-      },
-    });
+    if (serviceSlug) {
+      const service = await prisma.service.findFirst({
+        where: {
+          slug: serviceSlug
+        },
+        include: {
+          category: true,
+          images: true
+        }
+      });
 
-    if (service) {
-      // Nếu tìm thấy dịch vụ và có category, chuyển hướng đến URL với cấu trúc đúng
-      if (service.category) {
-        // Hiển thị trang chi tiết dịch vụ theo cấu trúc mới
+      if (service) {
         return await renderServicePage(service);
       }
-      
-      // Nếu dịch vụ không có category, hiển thị trang dịch vụ
-      return await renderServicePage(service);
     }
 
-    // Không tìm thấy param nào phù hợp
     notFound();
   } catch (error) {
     console.error("Error in service page:", error);
@@ -120,7 +154,6 @@ export default async function ServicePage({ params }: ServicePageProps) {
 }
 
 async function renderCategoryPage(category: any) {
-  // Lấy các dịch vụ thuộc danh mục này
   const services = await prisma.service.findMany({
     where: {
       categoryId: category.id,
@@ -137,15 +170,10 @@ async function renderCategoryPage(category: any) {
   return (
     <div className="min-h-screen bg-black pt-24">
       <div className="container mx-auto px-4 py-16">
-        {/* Breadcrumb */}
         <div className="mb-8 flex items-center text-sm text-gray-400">
-          <Link href="/" className="hover:text-red-600">
-            Trang Chủ
-          </Link>
+          <Link href="/" className="hover:text-red-600">Trang Chủ</Link>
           <ChevronRight className="mx-2 h-4 w-4" />
-          <Link href="/dich-vu" className="hover:text-red-600">
-            Dịch Vụ
-          </Link>
+          <Link href="/dich-vu" className="hover:text-red-600">Dịch Vụ</Link>
           <ChevronRight className="mx-2 h-4 w-4" />
           <span className="text-white">{category.name}</span>
         </div>
@@ -207,15 +235,10 @@ async function renderServicePage(service: any) {
   return (
     <div className="min-h-screen bg-black pt-24">
       <div className="container mx-auto px-4 py-16">
-        {/* Breadcrumb */}
         <div className="mb-8 flex items-center text-sm text-gray-400">
-          <Link href="/" className="hover:text-red-600">
-            Trang Chủ
-          </Link>
+          <Link href="/" className="hover:text-red-600">Trang Chủ</Link>
           <ChevronRight className="mx-2 h-4 w-4" />
-          <Link href="/dich-vu" className="hover:text-red-600">
-            Dịch Vụ
-          </Link>
+          <Link href="/dich-vu" className="hover:text-red-600">Dịch Vụ</Link>
           {service.category && (
             <>
               <ChevronRight className="mx-2 h-4 w-4" />
@@ -228,9 +251,7 @@ async function renderServicePage(service: any) {
           <span className="text-white">{service.title}</span>
         </div>
 
-        {/* Service Detail Content */}
         <div className="grid gap-8 lg:grid-cols-2">
-          {/* Image Gallery */}
           <div className="space-y-4">
             <div className="relative aspect-video w-full overflow-hidden rounded-lg">
               <Image
@@ -254,7 +275,6 @@ async function renderServicePage(service: any) {
             </div>
           </div>
 
-          {/* Service Info */}
           <div className="space-y-6">
             <h1 className="text-3xl font-bold">{service.title}</h1>
             {service.category && (
@@ -309,7 +329,6 @@ async function renderServicePage(service: any) {
           </div>
         )}
         
-        {/* Related Services */}
         {relatedServices.length > 0 && (
           <div className="mt-16">
             <h2 className="mb-8 text-2xl font-bold">Dịch Vụ Liên Quan</h2>
@@ -339,4 +358,4 @@ async function renderServicePage(service: any) {
       </div>
     </div>
   );
-} 
+}

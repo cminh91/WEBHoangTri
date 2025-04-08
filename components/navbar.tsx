@@ -194,10 +194,13 @@ export default function Navbar({ storeInfo, categories }: NavbarProps) {
         <div className="hidden md:flex items-center gap-3">
           <CartButton />
           {storeInfo.hotline && (
-            <Button className="bg-red-600 hover:bg-red-700 transition-colors">
+            <a
+              href={`tel:${storeInfo.hotline}`}
+              className="bg-red-600 hover:bg-red-700 transition-colors inline-flex items-center px-4 py-2 rounded text-white font-semibold"
+            >
               <Phone className="mr-2 h-4 w-4" />
               {storeInfo.hotline}
-            </Button>
+            </a>
           )}
         </div>
 
@@ -305,10 +308,13 @@ export default function Navbar({ storeInfo, categories }: NavbarProps) {
               <li className="py-3 flex flex-col gap-3">
                 <CartButton />
                 {storeInfo.hotline && (
-                  <Button className="bg-red-600 hover:bg-red-700 w-full justify-center">
+                  <a
+                    href={`tel:${storeInfo.hotline}`}
+                    className="bg-red-600 hover:bg-red-700 w-full justify-center inline-flex items-center px-4 py-2 rounded text-white font-semibold"
+                  >
                     <Phone className="mr-2 h-4 w-4" />
                     {storeInfo.hotline}
-                  </Button>
+                  </a>
                 )}
               </li>
             </ul>

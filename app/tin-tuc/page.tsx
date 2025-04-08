@@ -14,7 +14,8 @@ export default async function NewsPage({
 }: {
   searchParams: { page?: string }
 }) {
-  const currentPage = searchParams.page ? Number.parseInt(searchParams.page) : 1
+  const resolvedSearchParams = await searchParams
+  const currentPage = resolvedSearchParams.page ? Number.parseInt(resolvedSearchParams.page) : 1
   const itemsPerPage = 9
 
   const totalNews = await prisma.news.count({

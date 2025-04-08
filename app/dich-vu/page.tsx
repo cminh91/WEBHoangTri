@@ -9,8 +9,8 @@ interface Service {
   id: string
   title: string
   slug: string
-  description: string
-  features: string
+  description: string | null
+  features: string | null
   images: Array<{ url: string }>
   category?: {
     name: string
@@ -65,7 +65,8 @@ export default async function ServicesPage({ searchParams }: PageProps) {
   })
   
   // Lấy dịch vụ với bộ lọc danh mục
-  const category = await searchParams.category
+  const resolvedSearchParams = await searchParams
+  const category = resolvedSearchParams.category
   const services = await getServices(category)
   
   // Tìm category name nếu có

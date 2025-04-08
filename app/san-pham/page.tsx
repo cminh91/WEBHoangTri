@@ -39,9 +39,10 @@ export default async function ProductsPage({
   // Build where clause
   const where: any = { isActive: true }
   
-  const category = await searchParams.category
-  const search = await searchParams.search
-  const sort = await searchParams.sort
+  const resolvedSearchParams = await searchParams
+  const category = resolvedSearchParams.category
+  const search = resolvedSearchParams.search
+  const sort = resolvedSearchParams.sort
 
   if (category) {
     where.category = { slug: category }
@@ -119,25 +120,15 @@ export default async function ProductsPage({
         {/* Product Grid - Cải thiện spacing và animation */}
         {products.length > 0 ? (
           <div className="grid grid-cols-1 gap-4 sm:gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-            {products.map((product: Product) => {
+            {products.map((product) => {
               const processedProduct = {
                 ...product,
                 price: Number(product.price),
                 salePrice: product.salePrice ? Number(product.salePrice) : null
-              }
+              } as Product
               return (
                 <div key={product.id} className="transform transition-transform hover:scale-[1.02] duration-300">
-                  <ProductCard product={{
-                    id: processedProduct.id,
-                    name: processedProduct.name,
-                    slug: processedProduct.slug,
-                    price: processedProduct.price,
-                    salePrice: processedProduct.salePrice,
-                    featured: processedProduct.featured,
-                    inStock: processedProduct.inStock,
-                    images: processedProduct.images,
-                    category: processedProduct.category
-                  } as Product} />
+                  <ProductCard product={processedProduct} />
                 </div>
               );
             })}

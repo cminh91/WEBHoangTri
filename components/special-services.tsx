@@ -4,6 +4,7 @@ import { useState, useEffect, useMemo, useCallback } from "react"
 import Image from "next/image"
 import Link from "next/link"
 import { getFeaturedServices } from "@/lib/queries"
+type Decimal = any
 
 interface Service {
   id: string
@@ -11,16 +12,34 @@ interface Service {
   slug?: string
   description: string | null
   images: { url: string; alt: string | null }[]
-  price: number | null
-  category: {
+  price: number | null | Decimal
+  category?: {
     id: string
     name: string
     slug: string
+    parent?: {
+      id: string
+      name: string
+      slug: string
+    } | null
   } | null
 }
 
 interface SpecialServicesProps {
   initialServices?: Service[]
+}
+
+function slugify(str: string | undefined | null): string {
+  if (!str) return "";
+  return str
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "") // remove diacritics
+    .replace(/đ/g, "d").replace(/Đ/g, "D")
+    .toLowerCase()
+    .replace(/\s+/g, "-")
+    .replace(/[^a-z0-9\-]/g, "")
+    .replace(/\-+/g, "-")
+    .replace(/^\-+|\-+$/g, "");
 }
 
 export default function SpecialServices({ initialServices }: SpecialServicesProps) {
@@ -74,7 +93,7 @@ export default function SpecialServices({ initialServices }: SpecialServicesProp
   return (
     <section className="bg-black py-16">
       <div className="container mx-auto px-4">
-        <h2 className="mb-6 text-4xl font-bold uppercase text-white">Dịch Vụ Nổi Bật</h2>
+        <h2 className="mb-6 text-4xl font-bold uppercase text-white text-center">Dịch Vụ Nổi Bật</h2>
         <div className="mb-8">
           <Link href="/dich-vu" className="text-lg font-semibold text-red-500 underline">
             XEM TẤT CẢ CÁC DỊCH VỤ
@@ -84,17 +103,17 @@ export default function SpecialServices({ initialServices }: SpecialServicesProp
         <div className="space-y-10 text-white">
           {/* Danh sách dịch vụ */}
           {displayedServices.map((service, index) => (
-            <Link href={`/dich-vu?category=${service.category?.slug || ''}`} key={service.id} className="block group">
+            <Link href={`/dich-vu/${slugify(service.category?.parent?.slug || service.category?.slug)}/${slugify(service.slug)}`} key={service.id} className="block group">
               <div className="grid grid-cols-1 md:grid-cols-2 items-center gap-12">
                 <>
                   {/* Hình ảnh bên trái */}
-                  <div className="relative w-full h-auto">
+                  <div className="relative w-full h-[350px]">
                     <Image
                       src={getImageUrl(service.images)}
                       alt={service.title}
                       width={600}
                       height={350}
-                      className="w-full h-auto object-cover rounded-lg transition-transform duration-300 group-hover:scale-105"
+                      className="w-full h-full object-cover rounded-lg transition-transform duration-300 group-hover:scale-105"
                       loading="lazy"
                       priority={false}
                     />
