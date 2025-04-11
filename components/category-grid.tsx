@@ -20,7 +20,7 @@ export default function CategoryGrid({ categories }: CategoryGridProps) {
   const displayedCategories = useMemo(() => categories.slice(0, 8), [categories])
 
   return (
-    <div className="bg-[#121212] px-6 md:px-20 py-8">
+    <div className="bg-black">
       {/* Nút "DANH MỤC" màu đỏ */}
       <div className="mb-6 flex justify-start">
         <button className="bg-red-600 text-white font-bold py-3 px-6 rounded transition-all">
@@ -39,7 +39,7 @@ export default function CategoryGrid({ categories }: CategoryGridProps) {
               {/* Background Image */}
                 <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity">
                 <Image
-                  src="/bg-danhmuc.png"
+                  src="/oke123.jpg"
                   alt="Background Image"
                   fill
                   className="object-cover"
@@ -57,7 +57,7 @@ export default function CategoryGrid({ categories }: CategoryGridProps) {
                       alt={category.name}
                       width={120}
                       height={120}
-                      className="object-contain"
+                      className="object-contain filter group-hover:brightness-0 group-hover:invert"
                     />
                   )}
                 </div>

@@ -16,7 +16,7 @@ interface PricingSectionProps {
 
 export default function PricingSection({ servicePackages, hotline }: PricingSectionProps) {
   return (
-    <section className="bg-black py-16">
+    <section className="bg-black">
       <div className="container mx-auto px-4">
         <h2 className="mb-2 text-center text-3xl font-bold md:text-4xl">GIÁ CẢ</h2>
         <p className="mb-12 text-center text-gray-400">Lựa chọn gói dịch vụ phù hợp với nhu cầu của bạn</p>
@@ -24,7 +24,7 @@ export default function PricingSection({ servicePackages, hotline }: PricingSect
           {servicePackages.map((pkg) => (
             <div
               key={pkg.id}
-              className="rounded-lg bg-zinc-800 p-8 flex flex-col h-full border border-zinc-700 hover:border-red-500 transition-shadow hover:shadow-lg"
+              className="rounded-lg bg-black p-8 flex flex-col h-full border border-zinc-700 hover:border-red-500 transition-shadow hover:shadow-lg"
             >
               <h3 className="mb-2 text-2xl font-bold text-white">{pkg.name}</h3>
               <div

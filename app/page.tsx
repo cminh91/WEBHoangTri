@@ -170,7 +170,7 @@ export default async function Home() {
         />
       </section>
       <section className="mb-4 md:mb-8">
-        <NewsSection initialNews={formattedNews} />
+        <NewsSection initialNews={formattedNews} featuredProducts={formattedProducts} />
       </section>
       <section className="mb-4 md:mb-8">
         <StatsCounter />

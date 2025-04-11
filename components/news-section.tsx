@@ -31,11 +31,12 @@ interface Product {
 
 interface NewsSectionProps {
   initialNews?: NewsItem[]
+  featuredProducts?: Product[]
 }
 
-export default function NewsSection({ initialNews }: NewsSectionProps) {
+export default function NewsSection({ initialNews, featuredProducts: initialFeatured }: NewsSectionProps) {
   const [news, setNews] = useState<NewsItem[]>(initialNews || [])
-  const [featuredProducts, setFeaturedProducts] = useState<Product[]>([])
+  const [featuredProducts, setFeaturedProducts] = useState<Product[]>(initialFeatured || [])
   const [currentProductIndex, setCurrentProductIndex] = useState(0)
 
   useEffect(() => {
@@ -67,7 +68,7 @@ export default function NewsSection({ initialNews }: NewsSectionProps) {
 
 
   return (
-    <section className="bg-black py-10 sm:py-16">
+    <section className="bg-black">
       <div className="container mx-auto px-3 sm:px-4 relative">
         <div className="mb-6 sm:mb-8 flex flex-col sm:flex-row sm:items-center">
           <div className="mb-3 sm:mb-0 mr-0 sm:mr-4 bg-red-600 px-3 py-1.5 sm:px-4 sm:py-2 text-base sm:text-lg font-bold uppercase text-white">Tin tức</div>

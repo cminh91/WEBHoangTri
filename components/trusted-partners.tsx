@@ -39,7 +39,7 @@ export default function TrustedPartners({ initialPartners }: TrustedPartnersProp
   }, [initialPartners])
 
   return (
-    <section className="py-16">
+    <section className="bg-black">
       <div className="container mx-auto px-4">
         <h2 className="text-3xl font-bold text-center mb-12">Đối Tác Của Chúng Tôi</h2>
         {loading ? (

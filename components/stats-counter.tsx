@@ -1,12 +1,12 @@
 export default function StatsCounter() {
   const stats = [
-    { number: "2+", label: "NĂM PHỤC VỤ" },
-    { number: "12+", label: "KHÁCH HÀNG HÀI LÒNG" },
-    { number: "6+", label: "SỰ HÀI LÒNG CỦA KHÁCH HÀNG" },
+    { number: "6+", label: "NĂM PHỤC VỤ" },
+    { number: "90+", label: "KHÁCH HÀNG HÀI LÒNG" },
+    { number: "120+", label: "SỰ HÀI LÒNG CỦA KHÁCH HÀNG" },
   ]
 
   return (
-    <section className="bg-black py-16 mt-20">
+    <section className="bg-black">
       <div className="container mx-auto px-4">
         <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
           {stats.map((stat, index) => (

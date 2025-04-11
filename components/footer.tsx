@@ -122,8 +122,8 @@ export default function Footer({ storeInfo, contactInfo, policies }: FooterProps
                   <Image
                     src="https://cliply.co/wp-content/uploads/2021/02/372102780_TIKTOK_ICON_1080.png"
                     alt="TikTok"
-                    width={24}
-                    height={24}
+                    width={60}
+                    height={60}
                     className="w-6 h-6 object-contain"
                   />
                 </a>

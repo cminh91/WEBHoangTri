@@ -71,7 +71,7 @@ export default function SpecialServices({ initialServices }: SpecialServicesProp
 
   if (loading) {
     return (
-      <section className="bg-black py-16">
+      <section className="bg-black">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 gap-8">
             {[...Array(3)].map((_, i) => (
@@ -91,7 +91,7 @@ export default function SpecialServices({ initialServices }: SpecialServicesProp
   }
 
   return (
-    <section className="bg-black py-16">
+    <section className="bg-black">
       <div className="container mx-auto px-4">
         <h2 className="mb-6 text-4xl font-bold uppercase text-white text-center">Dịch Vụ Nổi Bật</h2>
         <div className="mb-8">

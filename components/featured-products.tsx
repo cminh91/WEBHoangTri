@@ -132,7 +132,7 @@ export default function FeaturedProducts({ initialProducts, categories = [], sto
 
   if (loading) {
     return (
-      <section className="bg-black py-16">
+      <section className="bg-black">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
             {[...Array(4)].map((_, i) => (

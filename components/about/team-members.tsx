@@ -17,12 +17,12 @@ interface TeamMembersProps {
 
 export default function TeamMembers({ teamMembers }: TeamMembersProps) {
   return (
-    <div className="container mx-auto px-4 py-16 bg-black">
+    <div className="container bg-black">
       <h2 className="mb-2 text-center text-3xl font-bold uppercase text-red-600">
         Đội Ngũ Của Chúng Tôi
       </h2>
       <p className="mb-12 text-center text-gray-400">
-        Chúng tôi đã hợp nhất đầy đủ các chuyên gia và nghệ sĩ sửa xe ở đây
+        Chúng tôi đã hợp nhất đầy đủ các chuyên gia sửa xe ở đây
       </p>
       <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
         {teamMembers.map((member) => (

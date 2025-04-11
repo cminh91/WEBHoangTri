@@ -120,9 +120,7 @@ export default function Navbar({ storeInfo, categories }: NavbarProps) {
               />
             </div>
           )}
-          {!storeInfo.logo && (
-            <span className="ml-2 text-xl font-bold text-white">{storeInfo.name || 'MOTO EDIT'}</span>
-          )}
+          <span className="ml-2 text-xl font-bold text-white">{storeInfo.name || 'MOTO EDIT'}</span>
         </Link>
 
         {/* Desktop navigation */}
