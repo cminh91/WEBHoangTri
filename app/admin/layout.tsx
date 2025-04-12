@@ -1,6 +1,6 @@
+"use client"
 import type React from "react"
-import { getServerSession } from "next-auth/next"
-import { authOptions } from "@/lib/auth"
+import { useSession, SessionProvider } from "next-auth/react"
 import { Toaster } from "@/components/ui/toaster"
 import Link from "next/link"
 import {
@@ -24,7 +24,6 @@ import {
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
-// Add this interface at the top of your file
 interface SidebarItem {
   icon: React.ReactNode
   label: string
@@ -32,7 +31,6 @@ interface SidebarItem {
   children?: SidebarItem[]
 }
 
-// Tách layout riêng cho trang đăng nhập
 export function AdminLoginLayout({
   children,
 }: {
@@ -46,15 +44,32 @@ export function AdminLoginLayout({
   )
 }
 
-export default async function AdminLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
-  const session = await getServerSession(authOptions)
+function AdminLayoutContent({ children }: { children: React.ReactNode }) {
+  const { data: session, status } = useSession()
 
-  // Admin sidebar items
-  const sidebarItems = [
+  // Nếu đang loading session, hiển thị spinner
+  if (status === "loading") {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-zinc-900">
+        <svg className="animate-spin h-8 w-8 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
+        </svg>
+      </div>
+    )
+  }
+
+  // Nếu chưa đăng nhập, chỉ render children (không sidebar, không header)
+  if (status === "unauthenticated" || !session) {
+    return (
+      <div className="min-h-screen bg-zinc-900">
+        {children}
+        <Toaster />
+      </div>
+    )
+  }
+
+  const sidebarItems: SidebarItem[] = [
     { icon: <LayoutDashboard size={20} />, label: "Dashboard", href: "/admin" },
     { icon: <ShoppingBag size={20} />, label: "Danh mục", href: "/admin/categories" },
     { icon: <ShoppingBag size={20} />, label: "Sản Phẩm", href: "/admin/products" },
@@ -73,9 +88,11 @@ export default async function AdminLayout({
     { icon: <Info size={20} />, label: "Giới Thiệu", href: "/admin/about" },
     { icon: <House size={20} />, label: "Thông tin cửa hàng", href: "/admin/store" },
     { icon: <Info size={20} />, label: "Slider", href: "/admin/slider" },
-    { icon: <Settings size={20} />, label: "Cài Đặt", href: "/admin/settings", children: [
-      { icon: <Key size={20} />, label: "Thay đổi mật khẩu", href: "/admin/settings/password" }
-    ]},
+    {
+      icon: <Settings size={20} />, label: "Cài Đặt", href: "/admin/settings", children: [
+        { icon: <Key size={20} />, label: "Thay đổi mật khẩu", href: "/admin/settings/password" }
+      ]
+    },
   ]
 
   return (
@@ -90,7 +107,6 @@ export default async function AdminLayout({
             <span className="text-lg font-bold">Admin Panel</span>
           </Link>
         </div>
-        
         <nav className="flex-1 overflow-auto p-4">
           <ul className="space-y-2">
             {sidebarItems.map((item, index) => (
@@ -158,7 +174,6 @@ export default async function AdminLayout({
       <main className="flex-1 md:ml-64">
         <div className="pt-16 md:pt-0">
           {children}
-          {/* Chỉ để Toaster ở đây, không có Footer */}
           <Toaster />
         </div>
       </main>
@@ -166,3 +181,10 @@ export default async function AdminLayout({
   )
 }
 
+export default function AdminLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <SessionProvider>
+      <AdminLayoutContent>{children}</AdminLayoutContent>
+    </SessionProvider>
+  )
+}

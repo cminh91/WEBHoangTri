@@ -3,7 +3,7 @@ import { getServerSession } from "next-auth/next"
 import { authOptions } from "@/lib/auth"
 import prisma from "@/lib/db"
 import { z } from "zod"
-import bcrypt from "bcrypt"
+import bcrypt from "bcryptjs"
 
 // Schema for user update (password is optional)
 const userUpdateSchema = z.object({

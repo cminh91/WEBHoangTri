@@ -109,7 +109,7 @@ export default function NewsSection({ initialNews, featuredProducts: initialFeat
 
           {/* Featured product overlay */}
           {featuredProducts.length > 0 && (
-            <div className="absolute inset-x-0 bottom-20 sm:top-1/2 sm:left-1/2 sm:transform sm:-translate-x-1/2 sm:-translate-y-1/2 z-10 mt-10 sm:mt-10 flex justify-center">
+            <div className="absolute inset-x-0 bottom-20 sm:top-[30%] sm:left-1/2 sm:transform sm:-translate-x-1/2 sm:-translate-y-1/2 z-10 mt-10 sm:mt-10 flex justify-center">
               <div className="p-4 sm:p-6 rounded-lg shadow-xl w-full max-w-xs sm:max-w-md text-center">
                 <div className="relative h-40 w-40 sm:h-48 sm:w-48 mx-auto mb-3 sm:mb-4">
                   {featuredProducts.map((product, index) => (

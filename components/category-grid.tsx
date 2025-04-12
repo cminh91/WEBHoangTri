@@ -23,7 +23,7 @@ export default function CategoryGrid({ categories }: CategoryGridProps) {
     <div className="bg-black">
       {/* Nút "DANH MỤC" màu đỏ */}
       <div className="mb-6 flex justify-start">
-        <button className="bg-red-600 text-white font-bold py-3 px-6 rounded transition-all">
+        <button className="bg-red-600 text-white font-bold py-3 px-6 rounded transition-all ml-8">
           DANH MỤC
         </button>
       </div>

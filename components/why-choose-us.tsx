@@ -31,9 +31,9 @@ export default async function WhyChooseUs() {
                 __html: aboutData?.content || ""
               }}
             />
-            <Link href="/ve-chung-toi" passHref legacyBehavior>
-              <Button asChild className="bg-red-600 px-8 py-6 text-lg font-semibold text-white hover:bg-red-700">
-                <a>XEM THÊM</a>
+            <Link href="/ve-chung-toi">
+              <Button className="bg-red-600 px-8 py-6 text-lg font-semibold text-white hover:bg-red-700">
+                XEM THÊM
               </Button>
             </Link>
           </div>

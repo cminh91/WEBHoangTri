@@ -33,9 +33,16 @@ export default function StorePage() {
     const fetchStoreInfo = async () => {
       try {
         setIsLoading(true)
-        const response = await fetch("/api/store-info")
-        const data = await response.json()
+        const response = await fetch("/api/store-info", {
+          cache: 'no-store',  // Disable caching
+          next: { revalidate: 0 } // Force revalidate
+        })
         
+        if (!response.ok) {
+          throw new Error('Failed to fetch store info')
+        }
+
+        const data = await response.json()
         if (data && !data.error) {
           setStoreInfo({
             id: data.id || "",
@@ -46,11 +53,11 @@ export default function StorePage() {
             footer: data.footer || "",
           })
         }
-      } catch (error) {
+      } catch (error: any) {
         console.error("Error fetching store info:", error)
         toast({
           title: "Error",
-          description: "Failed to load store information",
+          description: error.message || "Lỗi khi tải thông tin cửa hàng",
           variant: "destructive",
         })
       } finally {
@@ -99,7 +106,10 @@ export default function StorePage() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(storeInfo),
+        cache: 'no-store'  // Disable caching
       })
+
+      const data = await response.json()
 
       if (response.ok) {
         toast({
@@ -107,14 +117,13 @@ export default function StorePage() {
           description: "Đã lưu thông tin cửa hàng",
         })
       } else {
-        const error = await response.json()
-        throw new Error(error.message || "Failed to save store information")
+        throw new Error(data.message || "Lỗi khi lưu thông tin")
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error saving store info:", error)
       toast({
         title: "Error",
-        description: "Failed to save store information",
+        description: error.message || "Lỗi khi lưu thông tin cửa hàng",
         variant: "destructive",
       })
     } finally {

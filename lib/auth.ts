@@ -1,7 +1,7 @@
 import { NextAuthOptions } from "next-auth"
 import CredentialsProvider from "next-auth/providers/credentials"
 import prisma from "@/lib/prisma"
-import { compare } from "bcrypt"
+import { compare } from "bcryptjs"
 
 // Mở rộng kiểu User để thêm role
 declare module "next-auth" {

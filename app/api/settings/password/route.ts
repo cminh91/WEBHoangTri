@@ -2,7 +2,7 @@ import { NextResponse } from "next/server"
 import { getServerSession } from "next-auth/next"
 import { authOptions } from "@/lib/auth"
 import prisma from "@/lib/db"
-import { hash, compare } from "bcrypt"
+import { hash, compare } from "bcryptjs"
 import { z } from "zod"
 
 // Schema for password change validation
